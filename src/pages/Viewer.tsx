@@ -90,10 +90,16 @@ export function Viewer() {
           )}
         </div>
       </header>
-      
-      <main className="flex-1 relative flex items-center justify-center p-4 sm:p-8">
+      {/* <main className="flex-1 relative flex items-center justify-center p-4 sm:p-8">
+        <FlipbookViewer pages={pageUrls} />
+      </main> */}
+      {/* <main className="flex-1 relative w-full h-full overflow-hidden">
+        <FlipbookViewer pages={pageUrls} />
+      </main> */}
+      <main className="flex-1 relative w-full h-full overflow-hidden flex items-center justify-center">
         <FlipbookViewer pages={pageUrls} />
       </main>
+
     </div>
   );
 }
