@@ -50,9 +50,16 @@ export function useFlipbooks() {
       if (pdfUploadError) throw pdfUploadError;
 
       // 3. Render PDF pages to JPEG using pdf.js
-      const pdfjsLib = await import('pdfjs-dist');
-      const pdfWorker = await import('pdfjs-dist/build/pdf.worker.min.mjs?url');
-      pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker.default;
+      let pdfjsLib;
+      let pdfWorker;
+      try {
+        pdfjsLib = await import('pdfjs-dist');
+        pdfWorker = await import('pdfjs-dist/build/pdf.worker.min.mjs?url');
+        pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker.default;
+      } catch (importError) {
+        console.error('Failed to load pdfjs-dist:', importError);
+        throw new Error('Failed to load the PDF processing engine. The server may have restarted. Please refresh the page and try again.');
+      }
 
       const arrayBuffer = await pdfFile.arrayBuffer();
       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;

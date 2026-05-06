@@ -9,10 +9,11 @@ export function Landing() {
 
   return (
     <div className="min-h-screen bg-background">
+      <a href="#landing-content" className="skip-to-content">Skip to content</a>
       <Navbar />
       
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-24 pb-32 sm:pt-32 sm:pb-40">
+      <section id="landing-content" className="relative overflow-hidden pt-24 pb-32 sm:pt-32 sm:pb-40">
         {/* Background decorative elements */}
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.1),rgba(255,255,255,0))]"></div>
         <div className="absolute top-0 right-0 -z-10 translate-x-1/3 -translate-y-1/4 transform-gpu blur-3xl" aria-hidden="true">
@@ -30,7 +31,7 @@ export function Landing() {
           <div className="mt-10 flex items-center justify-center gap-x-6 animate-fade-in-up delay-200">
             <Button size="lg" className="h-12 px-8 text-base" asChild id="landing-cta">
               <Link to={user ? '/dashboard' : '/auth'}>
-                {user ? 'Go to Dashboard' : 'Create Your First Flipbook'}
+                {user ? 'Go to My Library' : 'Create Your First Flipbook'}
               </Link>
             </Button>
             {!user && (

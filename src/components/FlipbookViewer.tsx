@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { PageFlip } from 'page-flip';
-import { ChevronLeft, ChevronRight, Maximize, Minimize, ZoomIn } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Maximize, Minimize, ZoomIn, ZoomOut } from 'lucide-react';
+import { Tooltip, TooltipTrigger, TooltipContent } from './ui/tooltip';
+import { Slider } from './ui/slider';
 
 interface FlipbookViewerProps {
   pages: string[];
@@ -117,6 +119,10 @@ export function FlipbookViewer({ pages, chromeless = false }: FlipbookViewerProp
     return () => document.removeEventListener('fullscreenchange', handler);
   }, []);
 
+  const handleZoomChange = useCallback((value: number[]) => {
+    setZoom(value[0]);
+  }, []);
+
   return (
     <>
       <div
@@ -132,16 +138,25 @@ export function FlipbookViewer({ pages, chromeless = false }: FlipbookViewerProp
         </div>
       </div>
 
-      <div className={`absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 sm:gap-4 rounded-full bg-zinc-900/80 backdrop-blur-xl border border-white/10 px-4 py-2 shadow-2xl transition-opacity duration-300 ${chromeless ? 'opacity-0 hover:opacity-100' : ''}`}>
-        <button 
-          onClick={goPrev} 
-          disabled={currentPage <= 0} 
-          className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-300 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-30 disabled:hover:bg-transparent"
-          aria-label="Previous page"
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </button>
+      <div className={`absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1.5 sm:gap-3 rounded-2xl bg-zinc-900/85 backdrop-blur-xl border border-white/8 px-3 sm:px-4 py-2 shadow-2xl transition-opacity duration-300 ${chromeless ? 'opacity-0 hover:opacity-100' : ''}`}>
+        {/* Previous Page */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button 
+              onClick={goPrev} 
+              disabled={currentPage <= 0} 
+              className="flex h-9 w-9 items-center justify-center rounded-xl text-zinc-300 transition-all hover:bg-white/10 hover:text-white active:scale-95 disabled:opacity-30 disabled:hover:bg-transparent"
+              aria-label="Previous page"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="top" className="bg-zinc-800 text-zinc-200 border-zinc-700">
+            Previous page
+          </TooltipContent>
+        </Tooltip>
 
+        {/* Page Navigator */}
         <div className="flex items-center text-sm font-medium text-zinc-400">
           <input
             type="number"
@@ -149,47 +164,94 @@ export function FlipbookViewer({ pages, chromeless = false }: FlipbookViewerProp
             max={totalPages}
             value={currentPage + 1}
             onChange={e => goToPage(parseInt(e.target.value, 10) - 1)}
-            className="w-10 bg-transparent text-center text-white focus:outline-none focus:ring-1 focus:ring-primary rounded"
+            className="w-10 bg-white/5 text-center text-white rounded-lg border border-white/10 focus:outline-none focus:border-primary py-0.5"
             aria-label="Go to page"
           />
           <span className="mx-1">/</span>
           <span>{totalPages}</span>
         </div>
 
-        <button 
-          onClick={goNext} 
-          disabled={currentPage >= totalPages - 1} 
-          className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-300 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-30 disabled:hover:bg-transparent"
-          aria-label="Next page"
-        >
-          <ChevronRight className="h-5 w-5" />
-        </button>
+        {/* Next Page */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button 
+              onClick={goNext} 
+              disabled={currentPage >= totalPages - 1} 
+              className="flex h-9 w-9 items-center justify-center rounded-xl text-zinc-300 transition-all hover:bg-white/10 hover:text-white active:scale-95 disabled:opacity-30 disabled:hover:bg-transparent"
+              aria-label="Next page"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="top" className="bg-zinc-800 text-zinc-200 border-zinc-700">
+            Next page
+          </TooltipContent>
+        </Tooltip>
 
         {!chromeless && (
           <>
-            <div className="h-5 w-px bg-white/15 mx-1" />
+            <div className="h-5 w-px bg-white/10 mx-0.5 sm:mx-1" />
             
+            {/* Zoom Controls — Desktop only */}
             <div className="hidden sm:flex items-center gap-2">
-              <ZoomIn className="h-4 w-4 text-zinc-400" />
-              <input
-                type="range"
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => setZoom(prev => Math.max(0.5, prev - 0.1))}
+                    disabled={zoom <= 0.5}
+                    className="flex h-8 w-8 items-center justify-center rounded-xl text-zinc-400 transition-all hover:bg-white/10 hover:text-white active:scale-95 disabled:opacity-30"
+                    aria-label="Zoom out"
+                  >
+                    <ZoomOut className="h-3.5 w-3.5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="bg-zinc-800 text-zinc-200 border-zinc-700">
+                  Zoom out
+                </TooltipContent>
+              </Tooltip>
+
+              <Slider
+                value={[zoom]}
                 min={0.5}
                 max={2}
                 step={0.1}
-                value={zoom}
-                onChange={e => setZoom(parseFloat(e.target.value))}
-                className="w-20 accent-primary"
-                aria-label="Zoom"
+                onValueChange={handleZoomChange}
+                className="w-20 [&_[data-slot=slider-track]]:bg-white/10 [&_[data-slot=slider-range]]:bg-primary/60 [&_[data-slot=slider-thumb]]:bg-white [&_[data-slot=slider-thumb]]:border-white/50 [&_[data-slot=slider-thumb]]:h-3 [&_[data-slot=slider-thumb]]:w-3"
+                aria-label="Zoom level"
               />
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => setZoom(prev => Math.min(2, prev + 0.1))}
+                    disabled={zoom >= 2}
+                    className="flex h-8 w-8 items-center justify-center rounded-xl text-zinc-400 transition-all hover:bg-white/10 hover:text-white active:scale-95 disabled:opacity-30"
+                    aria-label="Zoom in"
+                  >
+                    <ZoomIn className="h-3.5 w-3.5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="bg-zinc-800 text-zinc-200 border-zinc-700">
+                  Zoom in
+                </TooltipContent>
+              </Tooltip>
             </div>
             
-            <button 
-              onClick={toggleFullscreen} 
-              className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-300 transition-colors hover:bg-white/10 hover:text-white"
-              aria-label="Toggle fullscreen"
-            >
-              {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
-            </button>
+            {/* Fullscreen */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button 
+                  onClick={toggleFullscreen} 
+                  className="flex h-9 w-9 items-center justify-center rounded-xl text-zinc-300 transition-all hover:bg-white/10 hover:text-white active:scale-95"
+                  aria-label="Toggle fullscreen"
+                >
+                  {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="bg-zinc-800 text-zinc-200 border-zinc-700">
+                {isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+              </TooltipContent>
+            </Tooltip>
           </>
         )}
       </div>

@@ -79,7 +79,29 @@
   }
 }
 
-/* Custom Animations */
+/* ──────────────────────────────────────────────
+   Focus Ring — consistent accessible focus
+   ────────────────────────────────────────────── */
+@layer base {
+  *:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+    border-radius: var(--radius);
+  }
+}
+
+/* ──────────────────────────────────────────────
+   Skip-to-Content link (a11y)
+   ────────────────────────────────────────────── */
+.skip-to-content {
+  @apply sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999]
+         focus:bg-primary focus:text-primary-foreground focus:px-4 focus:py-2 focus:rounded-md
+         focus:shadow-lg focus:text-sm focus:font-medium;
+}
+
+/* ──────────────────────────────────────────────
+   Custom Animations
+   ────────────────────────────────────────────── */
 @keyframes fade-in-up {
   from {
     opacity: 0;
@@ -91,11 +113,43 @@
   }
 }
 
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
 .animate-fade-in-up {
   animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent 25%, rgba(255,255,255,0.08) 50%, transparent 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
 }
 
 .delay-100 { animation-delay: 100ms; }
 .delay-200 { animation-delay: 200ms; }
 .delay-300 { animation-delay: 300ms; }
 .delay-400 { animation-delay: 400ms; }
+
+/* ──────────────────────────────────────────────
+   Reduced Motion — disable animations for a11y
+   ────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-fade-in-up,
+  .animate-shimmer {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

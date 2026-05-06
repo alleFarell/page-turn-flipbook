@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { supabase } from '../lib/supabase';
 import type { Flipbook } from '../types/database';
 import { Card, CardContent, CardFooter } from './ui/card';
@@ -6,6 +7,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Badge } from './ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog';
+import { Tooltip, TooltipTrigger, TooltipContent } from './ui/tooltip';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -35,9 +37,12 @@ export function FlipbookCard({ flipbook, onView, onDelete, onUpdate }: FlipbookC
   const privateUrl = `${shareUrl}?token=${flipbook.share_token}`;
   const embedCode = `<iframe src="${window.location.origin}/embed/${flipbook.id}${flipbook.visibility === 'private' ? `?token=${flipbook.share_token}` : ''}" width="100%" height="600" frameborder="0" allowfullscreen></iframe>`;
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    // Could use sonner toast here if needed
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      toast.success(`${label} copied to clipboard`);
+    }).catch(() => {
+      toast.error('Failed to copy to clipboard');
+    });
   };
 
   const handleRename = async () => {
@@ -45,23 +50,39 @@ export function FlipbookCard({ flipbook, onView, onDelete, onUpdate }: FlipbookC
       setRenaming(false);
       return;
     }
-    await supabase.from('flipbooks').update({ title: newTitle.trim() }).eq('id', flipbook.id);
-    setRenaming(false);
-    onUpdate();
+    try {
+      await supabase.from('flipbooks').update({ title: newTitle.trim() }).eq('id', flipbook.id);
+      toast.success('Flipbook renamed');
+      setRenaming(false);
+      onUpdate();
+    } catch {
+      toast.error('Failed to rename flipbook');
+      setRenaming(false);
+    }
   };
 
   const toggleVisibility = async () => {
     const newVis = flipbook.visibility === 'public' ? 'private' : 'public';
-    await supabase.from('flipbooks').update({ visibility: newVis }).eq('id', flipbook.id);
-    onUpdate();
+    try {
+      await supabase.from('flipbooks').update({ visibility: newVis }).eq('id', flipbook.id);
+      toast.success(`Flipbook is now ${newVis}`);
+      onUpdate();
+    } catch {
+      toast.error('Failed to change visibility');
+    }
   };
 
   const rotateToken = async () => {
     const bytes = new Uint8Array(24);
     crypto.getRandomValues(bytes);
     const newToken = btoa(String.fromCharCode(...bytes)).replace(/[+/=]/g, c => c === '+' ? '-' : c === '/' ? '_' : '');
-    await supabase.from('flipbooks').update({ share_token: newToken }).eq('id', flipbook.id);
-    onUpdate();
+    try {
+      await supabase.from('flipbooks').update({ share_token: newToken }).eq('id', flipbook.id);
+      toast.success('Share token rotated — old links will stop working');
+      onUpdate();
+    } catch {
+      toast.error('Failed to rotate token');
+    }
   };
 
   return (
@@ -163,12 +184,22 @@ export function FlipbookCard({ flipbook, onView, onDelete, onUpdate }: FlipbookC
             <Button variant="default" size="sm" className="flex-1" onClick={() => onView(flipbook.id)}>
               <Eye className="mr-2 h-4 w-4" /> View
             </Button>
-            <Button variant="outline" size="icon" className="h-9 w-9 shrink-0" onClick={() => copyToClipboard(flipbook.visibility === 'public' ? shareUrl : privateUrl)} title="Copy Link">
-              <LinkIcon className="h-4 w-4" />
-            </Button>
-            <Button variant="outline" size="icon" className="h-9 w-9 shrink-0" onClick={() => copyToClipboard(embedCode)} title="Copy Embed Code">
-              <Code className="h-4 w-4" />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="outline" size="icon" className="h-9 w-9 shrink-0" onClick={() => copyToClipboard(flipbook.visibility === 'public' ? shareUrl : privateUrl, 'Share link')}>
+                  <LinkIcon className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Copy share link</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="outline" size="icon" className="h-9 w-9 shrink-0" onClick={() => copyToClipboard(embedCode, 'Embed code')}>
+                  <Code className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Copy embed code</TooltipContent>
+            </Tooltip>
           </CardFooter>
         )}
       </Card>

@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { useFlipbooks } from '../hooks/useFlipbooks';
 import { Navbar } from '../components/Navbar';
 import { FlipbookCard } from '../components/FlipbookCard';
+import { FlipbookCardSkeleton } from '../components/FlipbookCardSkeleton';
 import { UploadModal } from '../components/UploadModal';
 import { Button } from '../components/ui/button';
 import { Plus, Library } from 'lucide-react';
@@ -20,21 +22,24 @@ export function Dashboard() {
   const handleDelete = async (flipbook: Flipbook) => {
     try {
       await deleteFlipbook(flipbook);
+      toast.success(`"${flipbook.title}" deleted`);
       fetchFlipbooks();
     } catch (err) {
       console.error('Delete failed:', err);
-      alert('Failed to delete flipbook');
+      toast.error('Failed to delete flipbook');
     }
   };
 
   const handleUploadSuccess = (id: string) => {
+    toast.success('Flipbook created successfully!');
     navigate(`/viewer/${id}`);
   };
 
   return (
     <div className="min-h-screen bg-background pb-12">
+      <a href="#dashboard-content" className="skip-to-content">Skip to content</a>
       <Navbar />
-      <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10">
+      <main id="dashboard-content" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
           <h1 className="font-heading text-4xl font-semibold tracking-tight">My Library</h1>
           <Button onClick={() => setShowUpload(true)} id="btn-new-flipbook" size="lg">
@@ -44,9 +49,12 @@ export function Dashboard() {
         </div>
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-24 text-muted-foreground">
-            <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent mb-4" />
-            <p className="text-lg">Loading your flipbooks...</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="animate-fade-in-up" style={{ animationDelay: `${i * 60}ms` }}>
+                <FlipbookCardSkeleton />
+              </div>
+            ))}
           </div>
         ) : flipbooks.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed p-12 text-center animate-fade-in-up">

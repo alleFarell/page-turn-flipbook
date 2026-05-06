@@ -4,8 +4,39 @@ import { useFlipbooks } from '../hooks/useFlipbooks';
 import { useAuth } from '../hooks/useAuth';
 import { FlipbookViewer } from '../components/FlipbookViewer';
 import { Button } from '../components/ui/button';
-import { ArrowLeft, Lock, Loader2 } from 'lucide-react';
+import { Skeleton } from '../components/ui/skeleton';
+import { ArrowLeft, Lock } from 'lucide-react';
 import type { Flipbook } from '../types/database';
+
+function ViewerSkeleton() {
+  return (
+    <div className="flex min-h-screen flex-col bg-zinc-950">
+      {/* Header skeleton */}
+      <header className="flex h-14 items-center justify-between px-4 sm:px-6 bg-zinc-900/50 border-b border-zinc-800/50">
+        <div className="flex items-center gap-4">
+          <Skeleton className="h-8 w-16 bg-zinc-800" />
+          <Skeleton className="h-5 w-40 bg-zinc-800" />
+        </div>
+        <Skeleton className="h-6 w-20 rounded-full bg-zinc-800" />
+      </header>
+      
+      {/* Book skeleton */}
+      <main className="flex-1 flex items-center justify-center p-8">
+        <div className="flex gap-1">
+          {/* Left page */}
+          <Skeleton className="w-[300px] sm:w-[400px] h-[425px] sm:h-[565px] rounded-l-sm bg-zinc-900 border border-zinc-800" />
+          {/* Right page */}
+          <Skeleton className="w-[300px] sm:w-[400px] h-[425px] sm:h-[565px] rounded-r-sm bg-zinc-900/80 border border-zinc-800 hidden sm:block" />
+        </div>
+      </main>
+      
+      {/* Toolbar skeleton */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2">
+        <Skeleton className="h-12 w-72 rounded-2xl bg-zinc-800" />
+      </div>
+    </div>
+  );
+}
 
 export function Viewer() {
   const { id } = useParams<{ id: string }>();
@@ -36,12 +67,7 @@ export function Viewer() {
   }, [id, token, getFlipbookForViewer, getPageUrls]);
 
   if (loading) {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-950 text-zinc-100">
-        <Loader2 className="h-10 w-10 animate-spin text-zinc-500 mb-4" />
-        <p className="text-zinc-400">Loading flipbook...</p>
-      </div>
-    );
+    return <ViewerSkeleton />;
   }
 
   if (error || !flipbook) {
@@ -62,12 +88,13 @@ export function Viewer() {
 
   return (
     <div className="flex min-h-screen flex-col bg-zinc-950 text-zinc-100 overflow-hidden">
+      <a href="#viewer-content" className="skip-to-content">Skip to content</a>
       <header className="flex h-14 items-center justify-between px-4 sm:px-6 bg-zinc-900/50 backdrop-blur-md border-b border-zinc-800/50 z-10 relative">
         <div className="flex items-center gap-4">
           {isOwner && (
             <Button variant="ghost" size="sm" asChild className="text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50 -ml-2 hidden sm:flex">
               <Link to="/dashboard">
-                <ArrowLeft className="mr-2 h-4 w-4" /> Back
+                <ArrowLeft className="mr-2 h-4 w-4" /> My Library
               </Link>
             </Button>
           )}
@@ -90,16 +117,9 @@ export function Viewer() {
           )}
         </div>
       </header>
-      {/* <main className="flex-1 relative flex items-center justify-center p-4 sm:p-8">
-        <FlipbookViewer pages={pageUrls} />
-      </main> */}
-      {/* <main className="flex-1 relative w-full h-full overflow-hidden">
-        <FlipbookViewer pages={pageUrls} />
-      </main> */}
-      <main className="flex-1 relative w-full h-full overflow-hidden flex items-center justify-center">
+      <main id="viewer-content" className="flex-1 relative w-full h-full overflow-hidden flex items-center justify-center">
         <FlipbookViewer pages={pageUrls} />
       </main>
-
     </div>
   );
 }
