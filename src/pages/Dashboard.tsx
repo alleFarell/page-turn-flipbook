@@ -57,7 +57,7 @@ export function Dashboard() {
             ))}
           </div>
         ) : flipbooks.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed p-12 text-center animate-fade-in-up">
+          <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-primary/20 glass-panel p-12 text-center animate-fade-in-up">
             <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted mb-6">
               <Library className="h-10 w-10 text-muted-foreground" />
             </div>

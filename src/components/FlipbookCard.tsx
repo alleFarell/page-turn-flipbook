@@ -87,7 +87,7 @@ export function FlipbookCard({ flipbook, onView, onDelete, onUpdate }: FlipbookC
 
   return (
     <>
-      <Card className="group overflow-hidden flex flex-col h-full transition-all hover:border-primary/50 editorial-shadow">
+      <Card className="glass-card group overflow-hidden flex flex-col h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:border-primary/50">
         <div 
           className="relative aspect-[16/10] w-full bg-muted flex items-center justify-center overflow-hidden cursor-pointer"
           onClick={() => flipbook.status === 'ready' && onView(flipbook.id)}

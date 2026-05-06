@@ -17,7 +17,7 @@ export function Landing() {
         {/* Background decorative elements */}
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.1),rgba(255,255,255,0))]"></div>
         <div className="absolute top-0 right-0 -z-10 translate-x-1/3 -translate-y-1/4 transform-gpu blur-3xl" aria-hidden="true">
-          <div className="aspect-[1097/845] w-[68.5625rem] bg-gradient-to-tr from-[#ff4694] to-[#776fff] opacity-10" style={{ clipPath: 'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)' }}></div>
+          <div className="aspect-[1097/845] w-[68.5625rem] bg-gradient-to-tr from-[#0891B2] to-[#22D3EE] opacity-20" style={{ clipPath: 'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)' }}></div>
         </div>
 
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
@@ -57,7 +57,7 @@ export function Landing() {
           <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
             <div className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-4">
               
-              <div className="flex flex-col bg-card p-8 rounded-2xl border editorial-shadow transition-all hover:-translate-y-1 hover:border-primary/50">
+              <div className="flex flex-col glass-card p-8 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:border-primary/50">
                 <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
                   <FileUp className="h-6 w-6 text-primary" />
                 </div>
@@ -67,7 +67,7 @@ export function Landing() {
                 </p>
               </div>
 
-              <div className="flex flex-col bg-card p-8 rounded-2xl border editorial-shadow transition-all hover:-translate-y-1 hover:border-primary/50">
+              <div className="flex flex-col glass-card p-8 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:border-primary/50">
                 <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
                   <BookOpen className="h-6 w-6 text-primary" />
                 </div>
@@ -77,7 +77,7 @@ export function Landing() {
                 </p>
               </div>
 
-              <div className="flex flex-col bg-card p-8 rounded-2xl border editorial-shadow transition-all hover:-translate-y-1 hover:border-primary/50">
+              <div className="flex flex-col glass-card p-8 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:border-primary/50">
                 <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
                   <LinkIcon className="h-6 w-6 text-primary" />
                 </div>
@@ -87,7 +87,7 @@ export function Landing() {
                 </p>
               </div>
 
-              <div className="flex flex-col bg-card p-8 rounded-2xl border editorial-shadow transition-all hover:-translate-y-1 hover:border-primary/50">
+              <div className="flex flex-col glass-card p-8 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:border-primary/50">
                 <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
                   <Code className="h-6 w-6 text-primary" />
                 </div>

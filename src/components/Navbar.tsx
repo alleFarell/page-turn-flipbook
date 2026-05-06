@@ -20,7 +20,7 @@ export function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md" id="main-navbar" role="navigation" aria-label="Main navigation">
+    <nav className="sticky top-0 z-50 w-full glass-panel border-b-0" id="main-navbar" role="navigation" aria-label="Main navigation">
       <div className="max-w-7xl mx-auto flex h-16 items-center justify-between px-4 md:px-8">
         <Link to="/" className="flex items-center gap-2 transition-opacity hover:opacity-80">
           <BookOpen className="h-6 w-6 text-primary" />

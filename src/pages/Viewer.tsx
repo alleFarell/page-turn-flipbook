@@ -89,7 +89,7 @@ export function Viewer() {
   return (
     <div className="flex min-h-screen flex-col bg-zinc-950 text-zinc-100 overflow-hidden">
       <a href="#viewer-content" className="skip-to-content">Skip to content</a>
-      <header className="flex h-14 items-center justify-between px-4 sm:px-6 bg-zinc-900/50 backdrop-blur-md border-b border-zinc-800/50 z-10 relative">
+      <header className="flex h-14 items-center justify-between px-4 sm:px-6 bg-zinc-900/60 backdrop-blur-xl border-b border-white/10 z-10 relative shadow-md">
         <div className="flex items-center gap-4">
           {isOwner && (
             <Button variant="ghost" size="sm" asChild className="text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50 -ml-2 hidden sm:flex">

@@ -2,7 +2,7 @@
 
 > **Last updated:** 2026-05-06  
 > **Reference platform:** [Heyzine](https://heyzine.com)  
-> **Current aesthetic:** Modern Editorial (Newsreader serif + Plus Jakarta Sans)
+> **Current aesthetic:** Modern, Fresh, Professional (Poppins + Open Sans + Glassmorphism)
 
 ---
 
@@ -12,8 +12,8 @@
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| `--font-sans` | Plus Jakarta Sans | Body text, labels, buttons |
-| `--font-heading` | Newsreader (serif) | h1–h6, titles, brand text |
+| `--font-sans` | Open Sans | Body text, labels, buttons |
+| `--font-heading` | Poppins | h1–h6, titles, brand text |
 
 **Assessment:** ✅ Good foundation — editorial serif + modern sans pairing is distinctive.  
 **Gap:** No typographic scale defined (no `text-xs` → `text-4xl` mapping with line-height/tracking). Inconsistent usage across pages.
@@ -22,14 +22,12 @@
 
 | Token | Light | Dark | Assessment |
 |-------|-------|------|------------|
-| `--primary` | `hsl(221, 83%, 53%)` | `hsl(217, 91%, 60%)` | ⚠️ Generic blue — lacks brand identity |
-| `--background` | `hsl(0, 0%, 100%)` | `hsl(240, 10%, 3.9%)` | ✅ Clean |
-| `--card` | White | `hsl(240, 10%, 3.9%)` | ✅ Standard |
-| `--muted` | `hsl(210, 40%, 96%)` | `hsl(217, 33%, 17.5%)` | ✅ Functional |
-| `--destructive` | `hsl(0, 84%, 60%)` | `hsl(0, 63%, 31%)` | ✅ Standard |
-| `--border` | `hsl(214, 32%, 91%)` | `hsl(217, 33%, 17.5%)` | ✅ Subtle |
+| `--primary` | `191 91% 36%` (Cyan 600) | `188 86% 53%` (Cyan 400) | ✅ Strong brand identity |
+| `--secondary` | `188 86% 53%` (Cyan 400) | `191 91% 36%` (Cyan 600) | ✅ Vibrant accent |
+| `--accent` | `142 71% 45%` (Green 500) | `142 71% 58%` (Green 400) | ✅ High contrast CTA |
+| `--background` | `185 100% 96%` (Cyan 50) | `196 79% 15%` (Cyan 950) | ✅ Thematic depth |
 
-**Gap:** No accent/secondary highlight color, no gradient tokens, no brand color beyond generic blue.
+**Assessment:** ✅ Fresh, professional palette implemented in Phase 1.5.
 
 ### Component Library
 
