@@ -1,8 +1,8 @@
 # Progress Tracker — UI/UX Roadmap
 
-> **Current Phase:** Phase 1 — Foundation Polish ✅  
+> **Current Phase:** Phase 2 — Viewer Overhaul ✅  
 > **Started:** 2026-05-06  
-> **Last updated:** 2026-05-06
+> **Last updated:** 2026-05-07
 
 ---
 
@@ -75,17 +75,41 @@
 
 ---
 
-## Phase 2 — Viewer Overhaul *(not started)*
+## Phase 2 — Viewer Overhaul ✅ COMPLETE
 
-- [ ] Redesign toolbar layout
-- [ ] Add ToC slide-out drawer
-- [ ] Add thumbnail grid overlay
-- [ ] Add page-turn sound effect (optional, toggleable)
-- [ ] Add transition animation when entering viewer
-- [ ] Implement loading skeleton shaped like an open book
-- [ ] Add subtle page shadow and depth effects
-- [ ] Virtualize page rendering
+> Premium Heyzine-inspired viewer with dynamic sizing, 3D book depth, and thumbnail navigation.
 
+### Batch 1 — Core Engine ✅
+- [x] **Dynamic page dimension probing** — `probePageDimensions()` in `useFlipbooks.ts` probes first page image natural dimensions
+- [x] **Dynamic sizing** — FlipbookViewer auto-computes page width/height from PDF aspect ratio, no more hardcoded A4
+- [x] **Cover page centering** — first & last pages use `data-density="hard"` for single-page centered display (Heyzine-style)
+- [x] **Responsive layout** — `ResizeObserver` on viewer container, adapts page sizes on resize/orientation change
+- [x] **3D book depth effects** — CSS `perspective: 2000px`, spine shadow gradient, stacked-paper edge illusion
+- [x] **Entrance animation** — `animate-viewer-entrance` (scale + fade) on book mount
+
+### Batch 2 — Toolbar & Navigation ✅
+- [x] **3-cluster toolbar** — `[Thumbnails] | [◄ Page/Total ►] | [Zoom 100% | Sound | Download | Fullscreen]`
+- [x] **Thumbnail panel** — `ThumbnailPanel.tsx` bottom-anchored horizontal strip with auto-scroll to active, click-to-jump
+- [x] **Page-turn sound** — Web Audio API synthesized swoosh, ON by default, toggleable with Sound button
+- [x] **Download button** — available to all viewers, downloads original PDF
+- [x] **Auto-hide toolbar** — fades out after 4s inactivity, reappears on mouse move
+
+### Batch 3 — Polish & Performance ✅
+- [x] **Book-shaped loading skeleton** — dual-page spread with spine line and shimmer animation
+- [x] **Page virtualization** — only ±8 pages from current spread are rendered; others show pulse placeholder
+- [x] **Embed parity** — Embed page uses same dynamic sizing, dimension probing
+
+### Files Modified / Created
+| File | Changes |
+|------|---------|
+| `src/hooks/useFlipbooks.ts` | Added `probePageDimensions()` function |
+| `src/components/FlipbookViewer.tsx` | **REWRITTEN** — dynamic sizing, 3D effects, new toolbar, sound, virtualization |
+| `src/components/ThumbnailPanel.tsx` | **NEW** — bottom thumbnail strip component |
+| `src/pages/Viewer.tsx` | **REWRITTEN** — dimension probing, PDF URL, book-shaped skeleton, entrance animation |
+| `src/pages/Embed.tsx` | Updated with dynamic sizing and dimension probing |
+| `src/index.css` | Added slide-up, viewer-entrance animations, 3D book depth CSS |
+
+---
 ## Phase 3 — Library & Management *(not started)*
 
 - [ ] Add search bar with debounced filtering

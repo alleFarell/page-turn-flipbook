@@ -8,25 +8,37 @@ export function Embed() {
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token') || undefined;
-  const { getFlipbookForViewer, getPageUrls } = useFlipbooks();
+  const { getFlipbookForViewer, getPageUrls, probePageDimensions } = useFlipbooks();
 
   const [pageUrls, setPageUrls] = useState<string[]>([]);
+  const [pageDimensions, setPageDimensions] = useState<{ width: number; height: number } | undefined>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
     if (!id) return;
     getFlipbookForViewer(id, token)
-      .then(fb => {
+      .then(async (fb) => {
         if (!fb) {
           setError('Not found');
         } else if (fb.page_paths) {
-          setPageUrls(getPageUrls(fb.page_paths));
+          const urls = getPageUrls(fb.page_paths);
+          setPageUrls(urls);
+
+          // Probe first page for dynamic sizing
+          if (urls.length > 0) {
+            try {
+              const dims = await probePageDimensions(urls[0]);
+              setPageDimensions(dims);
+            } catch {
+              // Fallback to A4
+            }
+          }
         }
       })
       .catch(() => setError('Failed to load'))
       .finally(() => setLoading(false));
-  }, [id, token, getFlipbookForViewer, getPageUrls]);
+  }, [id, token, getFlipbookForViewer, getPageUrls, probePageDimensions]);
 
   if (loading) {
     return (
@@ -46,7 +58,11 @@ export function Embed() {
 
   return (
     <div className="min-h-screen bg-transparent flex items-center justify-center">
-      <FlipbookViewer pages={pageUrls} chromeless />
+      <FlipbookViewer
+        pages={pageUrls}
+        pageDimensions={pageDimensions}
+        chromeless
+      />
     </div>
   );
 }

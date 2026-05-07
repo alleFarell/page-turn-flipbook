@@ -6,6 +6,7 @@ import { FlipbookViewer } from '../components/FlipbookViewer';
 import { Button } from '../components/ui/button';
 import { Skeleton } from '../components/ui/skeleton';
 import { ArrowLeft, Lock } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 import type { Flipbook } from '../types/database';
 
 function ViewerSkeleton() {
@@ -19,20 +20,28 @@ function ViewerSkeleton() {
         </div>
         <Skeleton className="h-6 w-20 rounded-full bg-zinc-800" />
       </header>
-      
-      {/* Book skeleton */}
+
+      {/* Book-shaped skeleton with spine */}
       <main className="flex-1 flex items-center justify-center p-8">
-        <div className="flex gap-1">
+        <div className="relative flex">
           {/* Left page */}
-          <Skeleton className="w-[300px] sm:w-[400px] h-[425px] sm:h-[565px] rounded-l-sm bg-zinc-900 border border-zinc-800" />
+          <div className="relative">
+            <Skeleton className="w-[280px] sm:w-[380px] h-[400px] sm:h-[540px] rounded-l-sm bg-zinc-900 border border-zinc-800" />
+            <div className="absolute inset-0 animate-shimmer rounded-l-sm" />
+          </div>
+          {/* Spine line */}
+          <div className="w-[2px] bg-zinc-700 hidden sm:block" />
           {/* Right page */}
-          <Skeleton className="w-[300px] sm:w-[400px] h-[425px] sm:h-[565px] rounded-r-sm bg-zinc-900/80 border border-zinc-800 hidden sm:block" />
+          <div className="relative hidden sm:block">
+            <Skeleton className="w-[280px] sm:w-[380px] h-[400px] sm:h-[540px] rounded-r-sm bg-zinc-900/80 border border-zinc-800" />
+            <div className="absolute inset-0 animate-shimmer rounded-r-sm" style={{ animationDelay: '0.3s' }} />
+          </div>
         </div>
       </main>
-      
+
       {/* Toolbar skeleton */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2">
-        <Skeleton className="h-12 w-72 rounded-2xl bg-zinc-800" />
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
+        <Skeleton className="h-12 w-80 rounded-2xl bg-zinc-800" />
       </div>
     </div>
   );
@@ -43,10 +52,12 @@ export function Viewer() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token') || undefined;
   const { user } = useAuth();
-  const { getFlipbookForViewer, getPageUrls } = useFlipbooks();
+  const { getFlipbookForViewer, getPageUrls, probePageDimensions } = useFlipbooks();
 
   const [flipbook, setFlipbook] = useState<Flipbook | null>(null);
   const [pageUrls, setPageUrls] = useState<string[]>([]);
+  const [pageDimensions, setPageDimensions] = useState<{ width: number; height: number } | undefined>();
+  const [pdfUrl, setPdfUrl] = useState<string | undefined>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -54,17 +65,37 @@ export function Viewer() {
     if (!id) return;
     setLoading(true);
     getFlipbookForViewer(id, token)
-      .then(fb => {
+      .then(async (fb) => {
         if (!fb) {
           setError('Flipbook not found or access denied');
         } else {
           setFlipbook(fb);
-          if (fb.page_paths) setPageUrls(getPageUrls(fb.page_paths));
+          if (fb.page_paths) {
+            const urls = getPageUrls(fb.page_paths);
+            setPageUrls(urls);
+
+            // Probe first page for dynamic sizing
+            if (urls.length > 0) {
+              try {
+                const dims = await probePageDimensions(urls[0]);
+                setPageDimensions(dims);
+              } catch {
+                // Fallback to A4 aspect ratio
+              }
+            }
+          }
+          // Get PDF download URL
+          if (fb.pdf_path) {
+            const { data } = supabase.storage
+              .from('flipbook-pdfs')
+              .getPublicUrl(fb.pdf_path);
+            setPdfUrl(data.publicUrl);
+          }
         }
       })
       .catch(() => setError('Failed to load flipbook'))
       .finally(() => setLoading(false));
-  }, [id, token, getFlipbookForViewer, getPageUrls]);
+  }, [id, token, getFlipbookForViewer, getPageUrls, probePageDimensions]);
 
   if (loading) {
     return <ViewerSkeleton />;
@@ -117,8 +148,12 @@ export function Viewer() {
           )}
         </div>
       </header>
-      <main id="viewer-content" className="flex-1 relative w-full h-full overflow-hidden flex items-center justify-center">
-        <FlipbookViewer pages={pageUrls} />
+      <main id="viewer-content" className="flex-1 relative w-full h-[calc(100vh-3.5rem)] overflow-hidden flex items-center justify-center">
+        <FlipbookViewer
+          pages={pageUrls}
+          pageDimensions={pageDimensions}
+          pdfUrl={pdfUrl}
+        />
       </main>
     </div>
   );

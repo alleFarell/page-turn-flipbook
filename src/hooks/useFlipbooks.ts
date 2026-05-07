@@ -198,6 +198,16 @@ export function useFlipbooks() {
     });
   }, []);
 
+  const probePageDimensions = useCallback(async (imageUrl: string): Promise<{ width: number; height: number }> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight });
+      img.onerror = () => reject(new Error('Failed to probe page dimensions'));
+      img.crossOrigin = 'anonymous';
+      img.src = imageUrl;
+    });
+  }, []);
+
   return {
     flipbooks,
     loading,
@@ -208,5 +218,6 @@ export function useFlipbooks() {
     rotateShareToken,
     getFlipbookForViewer,
     getPageUrls,
+    probePageDimensions,
   };
 }
