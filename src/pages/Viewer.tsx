@@ -21,17 +21,45 @@ function ViewerSkeleton() {
       </header>
       
       {/* Book skeleton */}
-      <main className="flex-1 flex items-center justify-center p-8">
-        <div className="flex gap-1">
+      <main className="flex-1 flex items-center justify-center p-8 overflow-hidden relative">
+        <div className="flex relative shadow-[0_0_80px_rgba(0,0,0,0.6)]">
           {/* Left page */}
-          <Skeleton className="w-[300px] sm:w-[400px] h-[425px] sm:h-[565px] rounded-l-sm bg-zinc-900 border border-zinc-800" />
+          <div className="w-[300px] sm:w-[400px] h-[425px] sm:h-[565px] bg-zinc-900 border border-zinc-800 rounded-l-md relative overflow-hidden">
+             <div className="absolute top-8 left-8 right-12 bottom-12 flex flex-col gap-4 opacity-30">
+                <Skeleton className="h-8 w-3/4 bg-zinc-700" />
+                <Skeleton className="h-4 w-full bg-zinc-700" />
+                <Skeleton className="h-4 w-5/6 bg-zinc-700" />
+                <Skeleton className="h-4 w-full bg-zinc-700" />
+                <Skeleton className="h-4 w-4/5 bg-zinc-700" />
+             </div>
+             {/* Spine gradient left */}
+             <div className="absolute top-0 right-0 bottom-0 w-8 bg-gradient-to-l from-black/40 to-transparent" />
+          </div>
           {/* Right page */}
-          <Skeleton className="w-[300px] sm:w-[400px] h-[425px] sm:h-[565px] rounded-r-sm bg-zinc-900/80 border border-zinc-800 hidden sm:block" />
+          <div className="w-[300px] sm:w-[400px] h-[425px] sm:h-[565px] bg-zinc-900 border border-zinc-800 rounded-r-md border-l-0 relative overflow-hidden hidden sm:block">
+             <div className="absolute top-8 left-12 right-8 bottom-12 flex flex-col gap-4 opacity-30">
+                <Skeleton className="h-8 w-1/2 bg-zinc-700" />
+                <div className="flex gap-4 mb-2">
+                  <Skeleton className="h-24 w-24 bg-zinc-700" />
+                  <div className="flex flex-col gap-2 flex-1">
+                    <Skeleton className="h-4 w-full bg-zinc-700" />
+                    <Skeleton className="h-4 w-4/5 bg-zinc-700" />
+                    <Skeleton className="h-4 w-full bg-zinc-700" />
+                  </div>
+                </div>
+                <Skeleton className="h-4 w-full bg-zinc-700" />
+                <Skeleton className="h-4 w-3/4 bg-zinc-700" />
+             </div>
+             {/* Spine gradient right */}
+             <div className="absolute top-0 left-0 bottom-0 w-8 bg-gradient-to-r from-black/40 to-transparent" />
+          </div>
+          {/* Center spine crease line */}
+          <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-px bg-zinc-950/80 shadow-[0_0_2px_rgba(0,0,0,0.8)] z-10 hidden sm:block" />
         </div>
       </main>
       
       {/* Toolbar skeleton */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2">
+      <div className="w-full flex justify-center pb-6 pt-4">
         <Skeleton className="h-12 w-72 rounded-2xl bg-zinc-800" />
       </div>
     </div>

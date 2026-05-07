@@ -75,16 +75,27 @@
 
 ---
 
-## Phase 2 — Viewer Overhaul *(not started)*
-
-- [ ] Redesign toolbar layout
-- [ ] Add ToC slide-out drawer
-- [ ] Add thumbnail grid overlay
-- [ ] Add page-turn sound effect (optional, toggleable)
-- [ ] Add transition animation when entering viewer
-- [ ] Implement loading skeleton shaped like an open book
-- [ ] Add subtle page shadow and depth effects
-- [ ] Virtualize page rendering
+### Phase 2: Viewer Overhaul 
+- [x] **Heyzine-Style Refactoring**
+  - [x] Maximize viewport usage (eliminate unnecessary margins)
+  - [x] Switch to height-driven dynamic sizing to ensure aspect ratio fits perfectly within any screen size
+  - [x] Integrate entrance animations for loading the viewer
+  - [x] Relocate toolbar from floating overlap to a bottom strip integrated into document flow
+  - [x] Add download button to toolbar
+- [x] **New Features & Feedback**
+  - [x] Integrate subtle page-turn sound effects tied to Web Audio API
+  - [x] Add mute/unmute control to the toolbar
+  - [x] Design a Table of Contents side-drawer (currently rendering empty state due to schema limits)
+  - [x] Add Thumbnail Grid layout for fast visual navigation
+- [x] **Aesthetic Polish**
+  - [x] Redesign `ViewerSkeleton` to realistically mirror an open book shape
+  - [x] Introduce deep, soft spine shadows
+  - [x] Apply physical paper depth/rounding to outer cornersing
+- [ ] Add sort dropdown
+- [ ] Add view toggle (grid/list)
+- [ ] Redesign FlipbookCard hover actions
+- [ ] Add card skeleton animation
+- [ ] Add drag-to-reorder support
 
 ## Phase 3 — Library & Management *(not started)*
 
