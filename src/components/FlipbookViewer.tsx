@@ -27,6 +27,7 @@ export function FlipbookViewer({
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const [currentPage, setCurrentPage] = useState(0);
+  const [layoutPage, setLayoutPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [zoom, setZoom] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -101,10 +102,50 @@ export function FlipbookViewer({
           flipBookRef.current = flipBook;
           setTotalPages(pages.length);
           setCurrentPage(0);
+          setLayoutPage(0);
 
           flipBook.on('flip', (e) => {
-            setCurrentPage(e.data as number);
+            const pageNum = e.data as number;
+            setCurrentPage(pageNum);
+            setLayoutPage(pageNum);
             playPageTurnSound();
+          });
+
+          flipBook.on('changeState', (e) => {
+            const state = e.data as string;
+            
+            // Only update layout during the committed flip animation
+            if (state === 'flipping') {
+              try {
+                // Infer the target page by reading the internal calc direction
+                const flipController = (flipBook as any).getFlipController?.();
+                const calc = flipController?.getCalculation?.();
+                
+                if (calc) {
+                  const dir = calc.getDirection(); // 0 is FORWARD, 1 is BACK
+                  const isPortrait = flipBook.getOrientation() === 'portrait';
+                  const increment = isPortrait ? 1 : 2;
+                  
+                  let nextTarget = flipBook.getCurrentPageIndex();
+                  if (dir === 0) {
+                    nextTarget += increment;
+                  } else if (dir === 1) {
+                    nextTarget -= increment;
+                  }
+                  
+                  // Clamp to valid boundaries
+                  const pageCount = flipBook.getPageCount();
+                  nextTarget = Math.max(0, Math.min(nextTarget, pageCount - 1));
+                  
+                  setLayoutPage(nextTarget);
+                }
+              } catch (err) {
+                console.warn('Could not infer PageFlip target page', err);
+              }
+            } else if (state === 'read') {
+              // Ensure layout is always synced when resting
+              setLayoutPage(flipBook.getCurrentPageIndex());
+            }
           });
         }
       } catch (err) {
@@ -164,10 +205,10 @@ export function FlipbookViewer({
   }, []);
 
   let xOffsetPx = 0;
-  const isLastUnpairedPage = pages.length % 2 === 0 && currentPage === pages.length - 1;
+  const isLastUnpairedPage = pages.length % 2 === 0 && layoutPage >= pages.length - 1;
 
   if (!isMobile) {
-    if (currentPage === 0) {
+    if (layoutPage === 0) {
       xOffsetPx = -(pageWidth / 2);
     } else if (isLastUnpairedPage) {
       xOffsetPx = (pageWidth / 2);
@@ -188,18 +229,9 @@ export function FlipbookViewer({
             transition: 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.7s ease-out'
           }}
         >
-          {/* Dynamic Book Backing / Outer Shadow */}
-          <div
-            className="absolute top-0 bottom-0 bg-zinc-100 shadow-[0_0_60px_rgba(0,0,0,0.5)] rounded-sm transition-all duration-800 ease-in-out pointer-events-none"
-            style={{
-              left: isMobile ? 0 : (currentPage === 0 ? '50%' : 0),
-              right: isMobile ? 0 : (isLastUnpairedPage ? '50%' : 0),
-            }}
-          />
-
           <div
             ref={containerRef}
-            className="relative z-10"
+            className="relative z-10 drop-shadow-[0_0_60px_rgba(0,0,0,0.5)]"
             style={{ width: pageWidth * (isMobile ? 1 : 2), height: pageHeight }}
           >
             {pages.map((url, i) => {
