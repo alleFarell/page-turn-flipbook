@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useFlipbooks } from '../hooks/useFlipbooks';
 import { FlipbookViewer } from '../components/FlipbookViewer';
+import type { Flipbook } from '../types/database';
 import { Loader2 } from 'lucide-react';
 
 export function Embed() {
@@ -10,6 +11,7 @@ export function Embed() {
   const token = searchParams.get('token') || undefined;
   const { getFlipbookForViewer, getPageUrls } = useFlipbooks();
 
+  const [flipbook, setFlipbook] = useState<Flipbook | null>(null);
   const [pageUrls, setPageUrls] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -20,8 +22,11 @@ export function Embed() {
       .then(fb => {
         if (!fb) {
           setError('Not found');
-        } else if (fb.page_paths) {
-          setPageUrls(getPageUrls(fb.page_paths));
+        } else {
+          setFlipbook(fb);
+          if (fb.page_paths) {
+            setPageUrls(getPageUrls(fb.page_paths));
+          }
         }
       })
       .catch(() => setError('Failed to load'))
@@ -46,7 +51,12 @@ export function Embed() {
 
   return (
     <div className="min-h-screen bg-transparent flex items-center justify-center">
-      <FlipbookViewer pages={pageUrls} chromeless />
+      <FlipbookViewer 
+        pages={pageUrls} 
+        chromeless 
+        designMode={flipbook?.design_mode}
+        config={flipbook?.config}
+      />
     </div>
   );
 }

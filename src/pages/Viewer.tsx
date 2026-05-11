@@ -146,7 +146,11 @@ export function Viewer() {
         </div>
       </header>
       <main id="viewer-content" className="flex-1 relative w-full h-full overflow-hidden flex items-center justify-center">
-        <FlipbookViewer pages={pageUrls} />
+        <FlipbookViewer 
+          pages={pageUrls} 
+          designMode={flipbook.design_mode}
+          config={flipbook.config}
+        />
       </main>
     </div>
   );

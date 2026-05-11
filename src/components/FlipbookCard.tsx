@@ -15,7 +15,8 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from './ui/dropdown-menu';
-import { BookOpen, Eye, Link as LinkIcon, Code, Globe, Lock, MoreVertical, Edit2, Trash2, RefreshCw } from 'lucide-react';
+import { BookOpen, Eye, Link as LinkIcon, Code, Globe, Lock, MoreVertical, Edit2, Trash2, RefreshCw, Palette } from 'lucide-react';
+import { DesignSettingsModal } from './DesignSettingsModal';
 
 interface FlipbookCardProps {
   flipbook: Flipbook;
@@ -28,6 +29,7 @@ export function FlipbookCard({ flipbook, onView, onDelete, onUpdate }: FlipbookC
   const [renaming, setRenaming] = useState(false);
   const [newTitle, setNewTitle] = useState(flipbook.title);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [showDesignSettings, setShowDesignSettings] = useState(false);
 
   const thumbUrl = flipbook.page_paths && flipbook.page_paths.length > 0
     ? supabase.storage.from('flipbook-pages').getPublicUrl(flipbook.page_paths[0]).data.publicUrl
@@ -144,6 +146,9 @@ export function FlipbookCard({ flipbook, onView, onDelete, onUpdate }: FlipbookC
                 <DropdownMenuItem onClick={() => setRenaming(true)}>
                   <Edit2 className="mr-2 h-4 w-4" /> Rename
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setShowDesignSettings(true)}>
+                  <Palette className="mr-2 h-4 w-4" /> Customize
+                </DropdownMenuItem>
                 {flipbook.status === 'ready' && (
                   <>
                     <DropdownMenuItem onClick={toggleVisibility}>
@@ -220,6 +225,13 @@ export function FlipbookCard({ flipbook, onView, onDelete, onUpdate }: FlipbookC
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <DesignSettingsModal
+        open={showDesignSettings}
+        onOpenChange={setShowDesignSettings}
+        flipbook={flipbook}
+        onUpdate={onUpdate}
+      />
     </>
   );
 }

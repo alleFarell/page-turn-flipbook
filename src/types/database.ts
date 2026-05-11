@@ -21,6 +21,8 @@ export type Database = {
           status: string
           title: string
           visibility: string
+          design_mode: 'magazine' | 'book' | 'album' | 'notebook' | 'slider' | 'cards' | 'coverflow' | 'one-page'
+          config: Json
         }
         Insert: {
           created_at?: string | null
@@ -33,6 +35,8 @@ export type Database = {
           status?: string
           title: string
           visibility?: string
+          design_mode?: 'magazine' | 'book' | 'album' | 'notebook' | 'slider' | 'cards' | 'coverflow' | 'one-page'
+          config?: Json
         }
         Update: {
           created_at?: string | null
@@ -45,6 +49,8 @@ export type Database = {
           status?: string
           title?: string
           visibility?: string
+          design_mode?: 'magazine' | 'book' | 'album' | 'notebook' | 'slider' | 'cards' | 'coverflow' | 'one-page'
+          config?: Json
         }
         Relationships: []
       }
@@ -66,6 +72,8 @@ export type Database = {
           status: string
           title: string
           visibility: string
+          design_mode: 'magazine' | 'book' | 'album' | 'notebook' | 'slider' | 'cards' | 'coverflow' | 'one-page'
+          config: Json
         }[]
       }
     }
