@@ -5,8 +5,17 @@ import { Slider } from './ui/slider';
 import { ThumbnailPanel } from './ThumbnailPanel';
 import { TocDrawer } from './TocDrawer';
 import { cn } from '../lib/utils';
-import { PageFlipViewer } from './viewers/PageFlipViewer';
-import type { ViewerRef } from './viewers/types';
+import {
+  MagazineViewer,
+  BookViewer,
+  AlbumViewer,
+  NotebookViewer,
+  OnePageViewer,
+  SliderViewer,
+  CardsViewer,
+  CoverflowViewer,
+} from './viewers';
+import type { ViewerRef } from './viewers';
 
 interface FlipbookViewerProps {
   pages: string[];
@@ -83,12 +92,6 @@ export function FlipbookViewer({
     setZoom(value[0]);
   }, []);
 
-  // Map designMode to appropriate viewer engine
-  // Currently, all rely on PageFlipViewer. This will expand in future tasks.
-  const isPageFlipEngine = ['magazine', 'book', 'album', 'notebook', 'one-page'].includes(designMode);
-  const isSliderEngine = designMode === 'slider';
-  const isCardsEngine = designMode === 'cards';
-  const isCoverflowEngine = designMode === 'coverflow';
 
   return (
     <div className="flex flex-col w-full h-full relative flex-1" style={{ backgroundColor: config.backgroundColor || '#09090b' }}>
@@ -97,29 +100,97 @@ export function FlipbookViewer({
       {/* Viewer Container Area */}
       <div className="flex-1 w-full flex items-center justify-center overflow-hidden relative pt-6">
         
-        {isPageFlipEngine && (
-          <PageFlipViewer
+        {/* VIEWER ROUTER
+          Each design mode has its own dedicated component.
+          To add a new mode: create a file in src/components/viewers/ and add a case here.
+        */}
+        {designMode === 'magazine' && (
+          <MagazineViewer
             ref={viewerRef}
-            pages={pages}
-            designMode={designMode}
-            config={config}
-            zoom={zoom}
-            isMobile={isMobile}
-            soundEnabled={soundEnabled}
-            showPageNumbers={showPageNumbers}
-            autoPageNumbering={autoPageNumbering}
+            pages={pages} designMode={designMode} config={config} zoom={zoom}
+            isMobile={isMobile} soundEnabled={soundEnabled}
+            showPageNumbers={showPageNumbers} autoPageNumbering={autoPageNumbering}
             pageLabels={pageLabels}
-            onPageChange={setCurrentPage}
-            onTotalPagesChange={setTotalPages}
+            onPageChange={setCurrentPage} onTotalPagesChange={setTotalPages}
             onLoad={() => setIsLoaded(true)}
           />
         )}
-        
-        {/* Placeholders for other engines */}
-        {(isSliderEngine || isCardsEngine || isCoverflowEngine) && (
-          <div className="text-white/50 text-center">
-            {designMode.charAt(0).toUpperCase() + designMode.slice(1)} Mode Engine Loading...
-          </div>
+        {designMode === 'book' && (
+          <BookViewer
+            ref={viewerRef}
+            pages={pages} designMode={designMode} config={config} zoom={zoom}
+            isMobile={isMobile} soundEnabled={soundEnabled}
+            showPageNumbers={showPageNumbers} autoPageNumbering={autoPageNumbering}
+            pageLabels={pageLabels}
+            onPageChange={setCurrentPage} onTotalPagesChange={setTotalPages}
+            onLoad={() => setIsLoaded(true)}
+          />
+        )}
+        {designMode === 'album' && (
+          <AlbumViewer
+            ref={viewerRef}
+            pages={pages} designMode={designMode} config={config} zoom={zoom}
+            isMobile={isMobile} soundEnabled={soundEnabled}
+            showPageNumbers={showPageNumbers} autoPageNumbering={autoPageNumbering}
+            pageLabels={pageLabels}
+            onPageChange={setCurrentPage} onTotalPagesChange={setTotalPages}
+            onLoad={() => setIsLoaded(true)}
+          />
+        )}
+        {designMode === 'notebook' && (
+          <NotebookViewer
+            ref={viewerRef}
+            pages={pages} designMode={designMode} config={config} zoom={zoom}
+            isMobile={isMobile} soundEnabled={soundEnabled}
+            showPageNumbers={showPageNumbers} autoPageNumbering={autoPageNumbering}
+            pageLabels={pageLabels}
+            onPageChange={setCurrentPage} onTotalPagesChange={setTotalPages}
+            onLoad={() => setIsLoaded(true)}
+          />
+        )}
+        {designMode === 'one-page' && (
+          <OnePageViewer
+            ref={viewerRef}
+            pages={pages} designMode={designMode} config={config} zoom={zoom}
+            isMobile={isMobile} soundEnabled={soundEnabled}
+            showPageNumbers={showPageNumbers} autoPageNumbering={autoPageNumbering}
+            pageLabels={pageLabels}
+            onPageChange={setCurrentPage} onTotalPagesChange={setTotalPages}
+            onLoad={() => setIsLoaded(true)}
+          />
+        )}
+        {designMode === 'slider' && (
+          <SliderViewer
+            ref={viewerRef}
+            pages={pages} designMode={designMode} config={config} zoom={zoom}
+            isMobile={isMobile} soundEnabled={soundEnabled}
+            showPageNumbers={showPageNumbers} autoPageNumbering={autoPageNumbering}
+            pageLabels={pageLabels}
+            onPageChange={setCurrentPage} onTotalPagesChange={setTotalPages}
+            onLoad={() => setIsLoaded(true)}
+          />
+        )}
+        {designMode === 'cards' && (
+          <CardsViewer
+            ref={viewerRef}
+            pages={pages} designMode={designMode} config={config} zoom={zoom}
+            isMobile={isMobile} soundEnabled={soundEnabled}
+            showPageNumbers={showPageNumbers} autoPageNumbering={autoPageNumbering}
+            pageLabels={pageLabels}
+            onPageChange={setCurrentPage} onTotalPagesChange={setTotalPages}
+            onLoad={() => setIsLoaded(true)}
+          />
+        )}
+        {designMode === 'coverflow' && (
+          <CoverflowViewer
+            ref={viewerRef}
+            pages={pages} designMode={designMode} config={config} zoom={zoom}
+            isMobile={isMobile} soundEnabled={soundEnabled}
+            showPageNumbers={showPageNumbers} autoPageNumbering={autoPageNumbering}
+            pageLabels={pageLabels}
+            onPageChange={setCurrentPage} onTotalPagesChange={setTotalPages}
+            onLoad={() => setIsLoaded(true)}
+          />
         )}
 
         <ThumbnailPanel
