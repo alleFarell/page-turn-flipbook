@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { Landing } from './pages/Landing';
 import { Auth } from './pages/Auth';
 import { Dashboard } from './pages/Dashboard';
+import { Browse } from './pages/Browse';
 import { Viewer } from './pages/Viewer';
 import { Embed } from './pages/Embed';
 import { NotFound } from './pages/NotFound';
@@ -15,6 +16,14 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <Dashboard />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/browse',
+    element: (
+      <ProtectedRoute>
+        <Browse />
       </ProtectedRoute>
     ),
   },

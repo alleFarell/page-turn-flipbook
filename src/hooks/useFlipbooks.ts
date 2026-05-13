@@ -4,20 +4,54 @@ import type { Flipbook } from '../types/database';
 
 export function useFlipbooks() {
   const [flipbooks, setFlipbooks] = useState<Flipbook[]>([]);
+  const [publicFlipbooks, setPublicFlipbooks] = useState<Flipbook[]>([]);
   const [loading, setLoading] = useState(false);
 
   const fetchFlipbooks = useCallback(async () => {
     setLoading(true);
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setFlipbooks([]);
+        return;
+      }
       const { data, error } = await supabase
         .from('flipbooks')
         .select('*')
+        .eq('owner_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
       setFlipbooks(data || []);
     } catch (err) {
       console.error('Error fetching flipbooks:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchPublicFlipbooks = useCallback(async () => {
+    setLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      let query = supabase
+        .from('flipbooks')
+        .select('*, profiles(display_name)')
+        .eq('visibility', 'public')
+        .eq('status', 'ready')
+        .order('created_at', { ascending: false });
+
+      if (user) {
+        query = query.neq('owner_id', user.id);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+      setPublicFlipbooks(data || []);
+    } catch (err) {
+      console.error('Error fetching public flipbooks:', err);
     } finally {
       setLoading(false);
     }
@@ -127,6 +161,71 @@ export function useFlipbooks() {
     }
   }, []);
 
+  const cloneFlipbook = useCallback(async (targetFlipbook: Flipbook) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Not authenticated');
+
+    // 1. Create a new flipbook record with processing status
+    const { data: newFlipbook, error: insertError } = await supabase
+      .from('flipbooks')
+      .insert({
+        owner_id: user.id,
+        title: `Copy of ${targetFlipbook.title}`,
+        status: 'processing',
+        visibility: 'private',
+        design_mode: targetFlipbook.design_mode,
+        config: targetFlipbook.config,
+        page_count: targetFlipbook.page_count,
+        pdf_path: null, // no access to original PDF
+      })
+      .select()
+      .single();
+
+    if (insertError || !newFlipbook) throw insertError || new Error('Failed to create flipbook clone');
+
+    try {
+      const newPagePaths: string[] = [];
+
+      // 2. Copy page images in storage
+      if (targetFlipbook.page_paths && targetFlipbook.page_paths.length > 0) {
+        const copyPromises = targetFlipbook.page_paths.map(async (oldPath, index) => {
+          const fileName = oldPath.split('/').pop() || `page-${String(index + 1).padStart(4, '0')}.jpg`;
+          const newPath = `${user.id}/${newFlipbook.id}/${fileName}`;
+          
+          const { error: copyError } = await supabase.storage
+            .from('flipbook-pages')
+            .copy(oldPath, newPath);
+            
+          if (copyError) throw copyError;
+          return newPath;
+        });
+
+        const copiedPaths = await Promise.all(copyPromises);
+        newPagePaths.push(...copiedPaths);
+      }
+
+      // 3. Update the new record to 'ready'
+      const { error: updateError } = await supabase
+        .from('flipbooks')
+        .update({
+          page_paths: newPagePaths.length > 0 ? newPagePaths : null,
+          status: 'ready'
+        })
+        .eq('id', newFlipbook.id);
+
+      if (updateError) throw updateError;
+      
+      return newFlipbook.id;
+    } catch (err) {
+      // Mark as failed if anything goes wrong
+      await supabase
+        .from('flipbooks')
+        .update({ status: 'failed' })
+        .eq('id', newFlipbook.id);
+      throw err;
+    }
+  }, []);
+
   const deleteFlipbook = useCallback(async (flipbook: Flipbook) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('Not authenticated');
@@ -200,8 +299,11 @@ export function useFlipbooks() {
 
   return {
     flipbooks,
+    publicFlipbooks,
     loading,
     fetchFlipbooks,
+    fetchPublicFlipbooks,
+    cloneFlipbook,
     createFlipbook,
     deleteFlipbook,
     updateFlipbook,

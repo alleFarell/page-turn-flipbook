@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '../hooks/useAuth';
-import { BookOpen, LogOut, LayoutDashboard } from 'lucide-react';
+import { BookOpen, LogOut, LayoutDashboard, Globe } from 'lucide-react';
 import { Button } from './ui/button';
 import { Tooltip, TooltipTrigger, TooltipContent } from './ui/tooltip';
 
@@ -30,11 +30,27 @@ export function Navbar() {
           {user ? (
             <>
               <Button variant="ghost" size="sm" asChild className="hidden sm:flex">
+                <Link to="/browse">
+                  <Globe className="mr-2 h-4 w-4" />
+                  Browse
+                </Link>
+              </Button>
+              <Button variant="ghost" size="sm" asChild className="hidden sm:flex">
                 <Link to="/dashboard">
                   <LayoutDashboard className="mr-2 h-4 w-4" />
                   My Library
                 </Link>
               </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" asChild className="sm:hidden">
+                    <Link to="/browse">
+                      <Globe className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Browse Community</TooltipContent>
+              </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button variant="ghost" size="icon" asChild className="sm:hidden">
