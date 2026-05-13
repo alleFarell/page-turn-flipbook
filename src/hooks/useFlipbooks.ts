@@ -253,7 +253,7 @@ export function useFlipbooks() {
     if (error) throw error;
   }, []);
 
-  const updateFlipbook = useCallback(async (id: string, updates: import('../types/database').FlipbookUpdate) => {
+  const updateFlipbook = useCallback(async (id: string, updates: Partial<Omit<Flipbook, 'profiles'>>) => {
     const { error } = await supabase
       .from('flipbooks')
       .update(updates)

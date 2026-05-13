@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { useFlipbooks } from '../hooks/useFlipbooks';
 import { useAuth } from '../hooks/useAuth';
@@ -114,10 +115,25 @@ export function Viewer() {
 
   const isOwner = user?.id === flipbook.owner_id;
 
+  // SVG noise — same data-uri as FlipbookViewer for consistency
+  const NOISE_BG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")`;
+
   return (
-    <div className="flex min-h-screen flex-col bg-zinc-950 text-zinc-100 overflow-hidden">
+    <div className="flex min-h-screen flex-col bg-zinc-950 text-zinc-100 overflow-hidden relative">
+      {/* Noise texture */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-0 opacity-[0.03] mix-blend-overlay"
+        style={{ backgroundImage: NOISE_BG, backgroundRepeat: 'repeat', backgroundSize: '200px 200px' }}
+      />
+
       <a href="#viewer-content" className="skip-to-content">Skip to content</a>
-      <header className="flex h-14 items-center justify-between px-4 sm:px-6 bg-zinc-900/60 backdrop-blur-xl border-b border-white/10 z-10 relative shadow-md">
+      <motion.header
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        className="flex h-14 items-center justify-between px-4 sm:px-6 bg-zinc-900/60 backdrop-blur-xl border-b border-white/10 z-10 relative shadow-md"
+      >
         <div className="flex items-center gap-4">
           {isOwner && (
             <Button variant="ghost" size="sm" asChild className="text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50 -ml-2 hidden sm:flex">
@@ -144,7 +160,7 @@ export function Viewer() {
             </span>
           )}
         </div>
-      </header>
+      </motion.header>
       <main id="viewer-content" className="flex-1 relative w-full h-full overflow-hidden flex items-center justify-center">
         <FlipbookViewer 
           pages={pageUrls} 
