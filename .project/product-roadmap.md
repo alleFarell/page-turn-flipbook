@@ -15,15 +15,15 @@
 
 | Task | Description | Priority | Impact | Effort | Status |
 |------|-------------|----------|--------|--------|--------|
-| **1.1 Magazine Mode** | Soft pages, center spine shadow, double spread, glossy overlay. | P0 | High | Medium | ⬜ |
-| **1.2 Book Mode** | Hard cover, realistic 3D thickness, stiff spine, endpapers. | P0 | High | High | ⬜ |
-| **1.3 Album Mode** | Flat lay, thick stiff pages, landscape-optimized layout. | P0 | High | Medium | ⬜ |
-| **1.4 Notebook Mode** | Spiral/binder rings on side or top, ruled/grid backgrounds. | P0 | High | High | ⬜ |
-| **1.5 Slider Mode** | Horizontal sliding presentation (no 3D flip animation). | P0 | High | Low | ⬜ |
-| **1.6 Cards Mode** | Stacked cards with swipe-away/tinder deck transition. | P0 | High | Medium | ⬜ |
-| **1.7 Coverflow Mode** | 3D horizontal scrolling coverflow style selection. | P1 | Medium | High | ⬜ |
-| **1.8 One Page Mode** | Single page vertical/horizontal snap scrolling. | P0 | High | Low | ⬜ |
-| **1.9 Theme Customizer UI** | Settings panel to switch between modes, pick bg colors, upload logos. | P0 | High | Medium | ⬜ |
+| **1.1 Magazine Mode** | Soft pages, center spine shadow, double spread, glossy overlay. | P0 | High | Medium | ✅ |
+| **1.2 Book Mode** | Hard cover, realistic 3D thickness, stiff spine, endpapers. | P0 | High | High | ✅ |
+| **1.3 Album Mode** | Flat lay, thick stiff pages, landscape-optimized layout. | P0 | High | Medium | ✅ |
+| **1.4 Notebook Mode** | Spiral/binder rings on side or top, ruled/grid backgrounds. | P0 | High | High | ✅ |
+| **1.5 Slider Mode** | Horizontal sliding presentation (no 3D flip animation). | P0 | High | Low | ✅ |
+| **1.6 Cards Mode** | Stacked cards with swipe-away/tinder deck transition. | P0 | High | Medium | ✅ |
+| **1.7 Coverflow Mode** | 3D horizontal scrolling coverflow style selection. | P1 | Medium | High | ✅ |
+| **1.8 One Page Mode** | Single page vertical/horizontal snap scrolling. | P0 | High | Low | ✅ |
+| **1.9 Theme Customizer UI** | Settings panel to switch between modes, pick bg colors, upload logos. | P0 | High | Medium | ✅ |
 
 ---
 
