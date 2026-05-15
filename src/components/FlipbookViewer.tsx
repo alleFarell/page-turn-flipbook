@@ -20,6 +20,7 @@ import {
   CoverflowViewer,
 } from './viewers';
 import type { ViewerRef } from './viewers';
+import paperTexture from '../assets/paper-texture-background.png';
 
 interface FlipbookViewerProps {
   pages: string[];
@@ -58,12 +59,6 @@ const atmosphereVariants = {
   visible: { opacity: 1, transition: { duration: 1.2, ease: 'easeOut' as const } },
 };
 
-// ─── Noise texture (SVG data‑uri — no extra element, pure CSS) ────────────
-// Applied via background-image directly so it tiles across the full viewport
-// without adding DOM weight.
-const NOISE_BG =
-  `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")`;
-
 
 export function FlipbookViewer({
   pages,
@@ -90,6 +85,7 @@ export function FlipbookViewer({
 
   // Derive dynamic accent for spotlight (fallback to a neutral lavender)
   const accentColor: string = config.accentColor || 'rgba(120,80,200,0.18)';
+  const isTransparent: boolean = config.backgroundTransparent === true;
 
   // Detect mobile
   useEffect(() => {
@@ -146,40 +142,47 @@ export function FlipbookViewer({
   return (
     <div
       className="flex flex-col w-full h-full relative flex-1 overflow-hidden"
-      style={{ backgroundColor: config.backgroundColor || '#09090b' }}
+      style={{ backgroundColor: isTransparent ? 'transparent' : (config.backgroundColor || '#09090b') }}
     >
-      {/* ── Noise Texture Overlay ── */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 z-0 opacity-[0.035] mix-blend-overlay"
-        style={{
-          backgroundImage: NOISE_BG,
-          backgroundRepeat: 'repeat',
-          backgroundSize: '200px 200px',
-        }}
-      />
+      {/* ── Paper Texture Overlay ── */}
+      {config.backgroundTexture !== false && (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 z-0 opacity-[0.15]"
+          style={{
+            backgroundImage: `url(${paperTexture})`,
+            backgroundRepeat: 'no-repeat',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        />
+      )}
 
       {/* ── Dynamic Atmosphere Spotlight ── */}
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 z-0"
-        variants={atmosphereVariants}
-        initial="hidden"
-        animate={isLoaded ? 'visible' : 'hidden'}
-        style={{
-          background: `radial-gradient(ellipse 70% 55% at 50% 48%, ${accentColor} 0%, transparent 75%)`,
-        }}
-      />
+      {!isTransparent && config.backgroundSpotlight !== false && (
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 z-0"
+          variants={atmosphereVariants}
+          initial="hidden"
+          animate={isLoaded ? 'visible' : 'hidden'}
+          style={{
+            background: `radial-gradient(ellipse 70% 55% at 50% 48%, ${accentColor} 0%, transparent 75%)`,
+          }}
+        />
+      )}
 
       {/* ── Deep vignette ring ── */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 z-0"
-        style={{
-          background:
-            'radial-gradient(ellipse 120% 110% at 50% 50%, transparent 50%, rgba(0,0,0,0.55) 100%)',
-        }}
-      />
+      {!isTransparent && config.backgroundVignette !== false && (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 z-0"
+          style={{
+            background:
+              'radial-gradient(ellipse 120% 110% at 50% 50%, transparent 50%, rgba(0,0,0,0.55) 100%)',
+          }}
+        />
+      )}
 
       <TocDrawer isOpen={isTocOpen} onClose={() => setIsTocOpen(false)} />
 

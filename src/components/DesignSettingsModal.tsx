@@ -188,6 +188,78 @@ export function DesignSettingsModal({ open, onOpenChange, flipbook, onUpdate }: 
                 </div>
                 <p className="text-[11px] text-muted-foreground italic px-1">Tip: Use a transparent PNG for the best result in the viewer toolbar.</p>
               </div>
+
+              {/* ── Background Effects ── */}
+              <div className="space-y-3 pt-2">
+                <Label className="text-sm font-medium">Background Effects</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className={cn(
+                    "flex items-center justify-between p-4 rounded-xl border transition-colors",
+                    config.backgroundTransparent
+                      ? "border-primary/30 bg-primary/5"
+                      : "border-white/5 bg-white/5 hover:bg-white/10"
+                  )}>
+                    <div className="space-y-0.5">
+                      <Label className="text-sm font-semibold">Transparent Background</Label>
+                      <p className="text-[11px] text-muted-foreground">Parent page shows through when embedded.</p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={config.backgroundTransparent === true}
+                      onChange={(e) => updateConfig('backgroundTransparent', e.target.checked)}
+                      className="h-5 w-5 rounded-md border-white/20 bg-white/5 text-primary focus:ring-primary focus:ring-offset-0"
+                    />
+                  </div>
+                  <div className={cn(
+                    "flex items-center justify-between p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 transition-colors",
+                    config.backgroundTransparent && "opacity-40 pointer-events-none"
+                  )}>
+                    <div className="space-y-0.5">
+                      <Label className="text-sm font-semibold">Noise Texture</Label>
+                      <p className="text-[11px] text-muted-foreground">Subtle paper-like grain overlay.</p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={config.backgroundTexture !== false}
+                      onChange={(e) => updateConfig('backgroundTexture', e.target.checked)}
+                      className="h-5 w-5 rounded-md border-white/20 bg-white/5 text-primary focus:ring-primary focus:ring-offset-0"
+                    />
+                  </div>
+                  <div className={cn(
+                    "flex items-center justify-between p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 transition-colors",
+                    config.backgroundTransparent && "opacity-40 pointer-events-none"
+                  )}>
+                    <div className="space-y-0.5">
+                      <Label className="text-sm font-semibold">Vignette</Label>
+                      <p className="text-[11px] text-muted-foreground">Soft dark edges for cinematic depth.</p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={config.backgroundVignette !== false}
+                      onChange={(e) => updateConfig('backgroundVignette', e.target.checked)}
+                      className="h-5 w-5 rounded-md border-white/20 bg-white/5 text-primary focus:ring-primary focus:ring-offset-0"
+                    />
+                  </div>
+                  <div className={cn(
+                    "flex items-center justify-between p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 transition-colors",
+                    config.backgroundTransparent && "opacity-40 pointer-events-none"
+                  )}>
+                    <div className="space-y-0.5">
+                      <Label className="text-sm font-semibold">Accent Spotlight</Label>
+                      <p className="text-[11px] text-muted-foreground">Radial glow using your accent color.</p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={config.backgroundSpotlight !== false}
+                      onChange={(e) => updateConfig('backgroundSpotlight', e.target.checked)}
+                      className="h-5 w-5 rounded-md border-white/20 bg-white/5 text-primary focus:ring-primary focus:ring-offset-0"
+                    />
+                  </div>
+                </div>
+                <p className="text-[11px] text-muted-foreground italic px-1">
+                  💡 Embed tip: Append <code className="bg-white/10 px-1.5 py-0.5 rounded text-[10px]">?bg=HEXCODE</code> or <code className="bg-white/10 px-1.5 py-0.5 rounded text-[10px]">?bg=transparent</code> to the viewer URL to override the background when embedding.
+                </p>
+              </div>
             </div>
           </TabsContent>
 

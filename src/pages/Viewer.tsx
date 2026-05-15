@@ -9,6 +9,7 @@ import { Skeleton } from '../components/ui/skeleton';
 import { ArrowLeft, Lock } from 'lucide-react';
 import type { Flipbook } from '../types/database';
 import { cn } from '../lib/utils';
+import paperTexture from '../assets/paper-texture-background.png';
 
 function ViewerSkeleton() {
   return (
@@ -21,45 +22,45 @@ function ViewerSkeleton() {
         </div>
         <Skeleton className="h-6 w-20 rounded-full bg-zinc-800" />
       </header>
-      
+
       {/* Book skeleton */}
       <main className="flex-1 flex items-center justify-center p-8 overflow-hidden relative">
         <div className="flex relative shadow-[0_0_80px_rgba(0,0,0,0.6)]">
           {/* Left page */}
           <div className="w-[300px] sm:w-[400px] h-[425px] sm:h-[565px] bg-zinc-900 border border-zinc-800 rounded-l-md relative overflow-hidden">
-             <div className="absolute top-8 left-8 right-12 bottom-12 flex flex-col gap-4 opacity-30">
-                <Skeleton className="h-8 w-3/4 bg-zinc-700" />
-                <Skeleton className="h-4 w-full bg-zinc-700" />
-                <Skeleton className="h-4 w-5/6 bg-zinc-700" />
-                <Skeleton className="h-4 w-full bg-zinc-700" />
-                <Skeleton className="h-4 w-4/5 bg-zinc-700" />
-             </div>
-             {/* Spine gradient left */}
-             <div className="absolute top-0 right-0 bottom-0 w-8 bg-gradient-to-l from-black/40 to-transparent" />
+            <div className="absolute top-8 left-8 right-12 bottom-12 flex flex-col gap-4 opacity-30">
+              <Skeleton className="h-8 w-3/4 bg-zinc-700" />
+              <Skeleton className="h-4 w-full bg-zinc-700" />
+              <Skeleton className="h-4 w-5/6 bg-zinc-700" />
+              <Skeleton className="h-4 w-full bg-zinc-700" />
+              <Skeleton className="h-4 w-4/5 bg-zinc-700" />
+            </div>
+            {/* Spine gradient left */}
+            <div className="absolute top-0 right-0 bottom-0 w-8 bg-gradient-to-l from-black/40 to-transparent" />
           </div>
           {/* Right page */}
           <div className="w-[300px] sm:w-[400px] h-[425px] sm:h-[565px] bg-zinc-900 border border-zinc-800 rounded-r-md border-l-0 relative overflow-hidden hidden sm:block">
-             <div className="absolute top-8 left-12 right-8 bottom-12 flex flex-col gap-4 opacity-30">
-                <Skeleton className="h-8 w-1/2 bg-zinc-700" />
-                <div className="flex gap-4 mb-2">
-                  <Skeleton className="h-24 w-24 bg-zinc-700" />
-                  <div className="flex flex-col gap-2 flex-1">
-                    <Skeleton className="h-4 w-full bg-zinc-700" />
-                    <Skeleton className="h-4 w-4/5 bg-zinc-700" />
-                    <Skeleton className="h-4 w-full bg-zinc-700" />
-                  </div>
+            <div className="absolute top-8 left-12 right-8 bottom-12 flex flex-col gap-4 opacity-30">
+              <Skeleton className="h-8 w-1/2 bg-zinc-700" />
+              <div className="flex gap-4 mb-2">
+                <Skeleton className="h-24 w-24 bg-zinc-700" />
+                <div className="flex flex-col gap-2 flex-1">
+                  <Skeleton className="h-4 w-full bg-zinc-700" />
+                  <Skeleton className="h-4 w-4/5 bg-zinc-700" />
+                  <Skeleton className="h-4 w-full bg-zinc-700" />
                 </div>
-                <Skeleton className="h-4 w-full bg-zinc-700" />
-                <Skeleton className="h-4 w-3/4 bg-zinc-700" />
-             </div>
-             {/* Spine gradient right */}
-             <div className="absolute top-0 left-0 bottom-0 w-8 bg-gradient-to-r from-black/40 to-transparent" />
+              </div>
+              <Skeleton className="h-4 w-full bg-zinc-700" />
+              <Skeleton className="h-4 w-3/4 bg-zinc-700" />
+            </div>
+            {/* Spine gradient right */}
+            <div className="absolute top-0 left-0 bottom-0 w-8 bg-gradient-to-r from-black/40 to-transparent" />
           </div>
           {/* Center spine crease line */}
           <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-px bg-zinc-950/80 shadow-[0_0_2px_rgba(0,0,0,0.8)] z-10 hidden sm:block" />
         </div>
       </main>
-      
+
       {/* Toolbar skeleton */}
       <div className="w-full flex justify-center pb-6 pt-4">
         <Skeleton className="h-12 w-72 rounded-2xl bg-zinc-800" />
@@ -116,29 +117,42 @@ export function Viewer() {
 
   const isOwner = user?.id === flipbook.owner_id;
 
-  // SVG noise — same data-uri as FlipbookViewer for consistency
-  const NOISE_BG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")`;
+  // ── Embed background override via ?bg= query param ──
+  const bgParam = searchParams.get('bg');
+  const mergedConfig: Record<string, any> = { ...(flipbook.config as Record<string, any> || {}) };
+  if (bgParam === 'transparent') {
+    mergedConfig.backgroundTransparent = true;
+  } else if (bgParam) {
+    mergedConfig.backgroundColor = bgParam.startsWith('#') ? bgParam : `#${bgParam}`;
+    mergedConfig.backgroundTransparent = false;
+  }
+  const isTransparent = mergedConfig.backgroundTransparent === true;
 
   return (
-    <div className="flex min-h-screen flex-col bg-zinc-950 text-zinc-100 overflow-hidden relative">
-      {/* Noise texture */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 z-0 opacity-[0.03] mix-blend-overlay"
-        style={{ backgroundImage: NOISE_BG, backgroundRepeat: 'repeat', backgroundSize: '200px 200px' }}
-      />
+    <div
+      className="flex min-h-screen flex-col text-zinc-100 overflow-hidden relative"
+      style={{ backgroundColor: isTransparent ? 'transparent' : (mergedConfig.backgroundColor || '#09090b') }}
+    >
+      {/* Paper texture */}
+      {mergedConfig.backgroundTexture !== false && (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 z-0 opacity-[0.15]"
+          style={{ backgroundImage: `url(${paperTexture})`, backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundPosition: 'center' }}
+        />
+      )}
 
       <a href="#viewer-content" className="skip-to-content">Skip to content</a>
-      {flipbook.config?.showHeader !== false && (
+      {mergedConfig.showHeader !== false && (
         <motion.header
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           className={cn(
             "flex h-14 items-center justify-between px-4 sm:px-6 backdrop-blur-xl border-b border-white/10 z-10 relative shadow-md",
-            !flipbook.config?.headerColor && "bg-zinc-900/60"
+            !mergedConfig.headerColor && "bg-zinc-900/60"
           )}
-          style={flipbook.config?.headerColor ? { backgroundColor: flipbook.config.headerColor } : {}}
+          style={mergedConfig.headerColor ? { backgroundColor: mergedConfig.headerColor } : {}}
         >
           <div className="flex items-center gap-4">
             {isOwner && (
@@ -169,10 +183,10 @@ export function Viewer() {
         </motion.header>
       )}
       <main id="viewer-content" className="flex-1 relative w-full h-full overflow-hidden flex items-center justify-center">
-        <FlipbookViewer 
-          pages={pageUrls} 
+        <FlipbookViewer
+          pages={pageUrls}
           designMode={flipbook.design_mode}
-          config={flipbook.config}
+          config={mergedConfig}
         />
       </main>
     </div>
