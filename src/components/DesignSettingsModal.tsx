@@ -210,10 +210,7 @@ export function DesignSettingsModal({ open, onOpenChange, flipbook, onUpdate }: 
                       className="h-5 w-5 rounded-md border-white/20 bg-white/5 text-primary focus:ring-primary focus:ring-offset-0"
                     />
                   </div>
-                  <div className={cn(
-                    "flex items-center justify-between p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 transition-colors",
-                    config.backgroundTransparent && "opacity-40 pointer-events-none"
-                  )}>
+                  <div className="flex items-center justify-between p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 transition-colors">
                     <div className="space-y-0.5">
                       <Label className="text-sm font-semibold">Noise Texture</Label>
                       <p className="text-[11px] text-muted-foreground">Subtle paper-like grain overlay.</p>
