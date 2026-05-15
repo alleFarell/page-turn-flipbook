@@ -21,9 +21,15 @@ export const OnePageViewer = forwardRef<ViewerRef, BaseViewerProps>(({
   onLoad,
 }, ref) => {
   // Always portrait — one page at a time regardless of device
-  const isPortrait = true;
-  const pageWidth  = isMobile ? Math.min(window.innerWidth - 40, 300) : 400;
+  const isPortrait = true; // Always 1 page wide
+  const MAX_PAGE_WIDTH = 512;
+  const pageWidth = isMobile
+    ? Math.min(window.innerWidth - 40, 320)
+    : Math.min(MAX_PAGE_WIDTH, Math.floor((window.innerWidth - 260) / 2));
   const pageHeight = Math.round(pageWidth * 1.414);
+
+  const viewportWidth = pageWidth + 40;
+  const viewportHeight = pageHeight + 40;
 
   const { containerRef, flipBookRef, layoutPage, isLoaded } = usePageFlip({
     pages, isPortrait, pageWidth, pageHeight,
@@ -47,37 +53,49 @@ export const OnePageViewer = forwardRef<ViewerRef, BaseViewerProps>(({
   return (
     <div
       className={cn(
-        'relative transition-all duration-700 ease-out flex items-center justify-center',
+        'relative transition-all duration-700 ease-out flex items-center justify-center overflow-visible',
         isLoaded ? 'opacity-100' : 'opacity-0 translate-y-4',
       )}
       style={{
+        width: viewportWidth,
+        height: viewportHeight,
         transform: `scale(${zoom})`,
         transformOrigin: 'center center',
         transition: 'transform 0.8s cubic-bezier(0.4,0,0.2,1), opacity 0.7s ease-out',
+        perspective: '2500px',
       }}
     >
       <div
         ref={containerRef}
-        className="relative z-10 drop-shadow-[0_0_60px_rgba(0,0,0,0.5)]"
-        style={{ width: pageWidth, height: pageHeight }}
+        className="relative z-10 drop-shadow-[0_20px_60px_rgba(0,0,0,0.4)] overflow-visible"
+        style={{ width: pageWidth, height: pageHeight, transformStyle: 'preserve-3d' }}
       >
         {pages.map((url, i) => (
           <div
             key={i}
-            className="flipbook-page bg-white overflow-hidden relative page-edge-style"
-            style={{ width: pageWidth, height: pageHeight }}
+            className="flipbook-page bg-white overflow-visible relative page-edge-style"
+            style={{ 
+              width: pageWidth, 
+              height: pageHeight,
+              transform: 'translateZ(0)',
+              backfaceVisibility: 'hidden',
+            }}
           >
             <img
               src={url}
               alt={`Page ${i + 1}`}
-              className="w-full h-full object-contain select-none pointer-events-none relative z-10"
+              className="w-full h-full object-contain select-none pointer-events-none relative z-10 mix-blend-multiply"
               loading={i < 4 ? 'eager' : 'lazy'}
+              style={{ imageRendering: 'auto' }}
             />
 
-            {/* Subtle edge shadow for single-page depth */}
+            {/* Inner binding shadow on the left edge for realism */}
             {config.showShadows !== false && (
-              <div className="absolute inset-0 pointer-events-none z-20"
-                style={{ boxShadow: 'inset 0 0 30px rgba(0,0,0,0.06)' }} />
+              <>
+                <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-black/40 via-black/5 to-transparent pointer-events-none mix-blend-multiply z-20" />
+                <div className="absolute inset-y-0 left-0 w-px bg-black/20 pointer-events-none z-20" />
+                <div className="absolute inset-y-0 left-1 w-2 bg-gradient-to-r from-white/10 to-transparent pointer-events-none z-20" />
+              </>
             )}
 
             {/* Page numbers */}

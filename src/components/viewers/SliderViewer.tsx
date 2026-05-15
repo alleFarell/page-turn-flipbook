@@ -46,7 +46,10 @@ export const SliderViewer = forwardRef<ViewerRef, BaseViewerProps>(({
 
   useImperativeHandle(ref, () => ({ goNext, goPrev, goToPage }));
 
-  const pageWidth  = isMobile ? Math.min(window.innerWidth - 40, 300) : 400;
+  const MAX_PAGE_WIDTH = 512;
+  const pageWidth = isMobile
+    ? Math.min(window.innerWidth - 40, 320)
+    : Math.min(MAX_PAGE_WIDTH, Math.floor((window.innerWidth - 260) / 2));
   const pageHeight = Math.round(pageWidth * 1.414);
 
   return (

@@ -8,6 +8,7 @@ import { Button } from '../components/ui/button';
 import { Skeleton } from '../components/ui/skeleton';
 import { ArrowLeft, Lock } from 'lucide-react';
 import type { Flipbook } from '../types/database';
+import { cn } from '../lib/utils';
 
 function ViewerSkeleton() {
   return (
@@ -128,39 +129,45 @@ export function Viewer() {
       />
 
       <a href="#viewer-content" className="skip-to-content">Skip to content</a>
-      <motion.header
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        className="flex h-14 items-center justify-between px-4 sm:px-6 bg-zinc-900/60 backdrop-blur-xl border-b border-white/10 z-10 relative shadow-md"
-      >
-        <div className="flex items-center gap-4">
-          {isOwner && (
-            <Button variant="ghost" size="sm" asChild className="text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50 -ml-2 hidden sm:flex">
-              <Link to="/dashboard">
-                <ArrowLeft className="mr-2 h-4 w-4" /> My Library
-              </Link>
-            </Button>
+      {flipbook.config?.showHeader !== false && (
+        <motion.header
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className={cn(
+            "flex h-14 items-center justify-between px-4 sm:px-6 backdrop-blur-xl border-b border-white/10 z-10 relative shadow-md",
+            !flipbook.config?.headerColor && "bg-zinc-900/60"
           )}
-          {isOwner && (
-            <Button variant="ghost" size="icon" asChild className="text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50 sm:hidden -ml-2">
-              <Link to="/dashboard">
-                <ArrowLeft className="h-4 w-4" />
-              </Link>
-            </Button>
-          )}
-          <span className="font-heading text-lg font-medium tracking-tight truncate max-w-[200px] sm:max-w-md">
-            {flipbook.title}
-          </span>
-        </div>
-        <div className="flex items-center">
-          {flipbook.page_count && (
-            <span className="text-xs font-medium text-zinc-500 bg-zinc-900 px-2.5 py-1 rounded-full">
-              {flipbook.page_count} pages
+          style={flipbook.config?.headerColor ? { backgroundColor: flipbook.config.headerColor } : {}}
+        >
+          <div className="flex items-center gap-4">
+            {isOwner && (
+              <Button variant="ghost" size="sm" asChild className="text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50 -ml-2 hidden sm:flex">
+                <Link to="/dashboard">
+                  <ArrowLeft className="mr-2 h-4 w-4" /> My Library
+                </Link>
+              </Button>
+            )}
+            {isOwner && (
+              <Button variant="ghost" size="icon" asChild className="text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50 sm:hidden -ml-2">
+                <Link to="/dashboard">
+                  <ArrowLeft className="h-4 w-4" />
+                </Link>
+              </Button>
+            )}
+            <span className="font-heading text-lg font-medium tracking-tight truncate max-w-[200px] sm:max-w-md">
+              {flipbook.title}
             </span>
-          )}
-        </div>
-      </motion.header>
+          </div>
+          <div className="flex items-center">
+            {flipbook.page_count && (
+              <span className="text-xs font-medium text-zinc-500 bg-zinc-900 px-2.5 py-1 rounded-full">
+                {flipbook.page_count} pages
+              </span>
+            )}
+          </div>
+        </motion.header>
+      )}
       <main id="viewer-content" className="flex-1 relative w-full h-full overflow-hidden flex items-center justify-center">
         <FlipbookViewer 
           pages={pageUrls} 

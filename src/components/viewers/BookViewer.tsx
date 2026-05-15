@@ -28,8 +28,15 @@ export const BookViewer = forwardRef<ViewerRef, BaseViewerProps>(({
 }, ref) => {
   // Books are always landscape double-spread (portrait only on mobile)
   const isPortrait = isMobile;
-  const pageWidth  = isMobile ? Math.min(window.innerWidth - 40, 300) : 400;
+  const MAX_PAGE_WIDTH = 512;
+  const pageWidth = isMobile
+    ? Math.min(window.innerWidth - 40, 320)
+    : Math.min(MAX_PAGE_WIDTH, Math.floor((window.innerWidth - 260) / 2));
   const pageHeight = Math.round(pageWidth * 1.414);
+
+  const spreadWidth = pageWidth * (isPortrait ? 1 : 2);
+  const viewportWidth = isPortrait ? pageWidth + 40 : spreadWidth + 270;
+  const viewportHeight = pageHeight + 40;
 
   const { containerRef, flipBookRef, layoutPage, isLoaded } = usePageFlip({
     pages, isPortrait, pageWidth, pageHeight,
@@ -68,14 +75,16 @@ export const BookViewer = forwardRef<ViewerRef, BaseViewerProps>(({
   return (
     <div
       className={cn(
-        'relative transition-all duration-700 ease-out flex items-center justify-center',
+        'relative transition-all duration-700 ease-out flex items-center justify-center overflow-visible',
         isLoaded ? 'opacity-100' : 'opacity-0 translate-y-4',
       )}
       style={{
+        width: viewportWidth,
+        height: viewportHeight,
         transform: `translateX(${xOffsetPx}px) scale(${zoom})`,
         transformOrigin: 'center center',
         transition: 'transform 0.8s cubic-bezier(0.4,0,0.2,1), opacity 0.7s ease-out',
-        perspective: '2000px',
+        perspective: '2500px',
       }}
     >
       {/* ── BOOK DECORATION (siblings of containerRef, never inside) ─────── */}
@@ -186,8 +195,8 @@ export const BookViewer = forwardRef<ViewerRef, BaseViewerProps>(({
       }}>
         <div
           ref={containerRef}
-          className="relative"
-          style={{ width: pageWidth * (isPortrait ? 1 : 2), height: pageHeight }}
+          className="relative overflow-visible"
+          style={{ width: spreadWidth, height: pageHeight, transformStyle: 'preserve-3d' }}
         >
           {pages.map((url, i) => {
             const isLeftPage  = i % 2 !== 0;
@@ -196,8 +205,13 @@ export const BookViewer = forwardRef<ViewerRef, BaseViewerProps>(({
             return (
               <div
                 key={i}
-                className="flipbook-page bg-[#fdfcfa] overflow-hidden relative page-edge-style"
-                style={{ width: pageWidth, height: pageHeight }}
+                className="flipbook-page bg-[#fdfcfa] overflow-visible relative page-edge-style"
+                style={{ 
+                  width: pageWidth, 
+                  height: pageHeight,
+                  transform: 'translateZ(0)',
+                  backfaceVisibility: 'hidden',
+                }}
               >
                 {/* Warm paper micro-texture */}
                 <div className="absolute inset-0 pointer-events-none opacity-[0.025]" style={{
@@ -210,6 +224,7 @@ export const BookViewer = forwardRef<ViewerRef, BaseViewerProps>(({
                   alt={`Page ${i + 1}`}
                   className="w-full h-full object-contain select-none pointer-events-none relative z-10 mix-blend-multiply"
                   loading={i < 4 ? 'eager' : 'lazy'}
+                  style={{ imageRendering: 'auto' }}
                 />
 
                 {/* Deep spine inner shadow */}

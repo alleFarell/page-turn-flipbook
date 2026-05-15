@@ -46,9 +46,12 @@ export const CoverflowViewer = forwardRef<ViewerRef, BaseViewerProps>(({
 
   useImperativeHandle(ref, () => ({ goNext, goPrev, goToPage }));
 
-  const pageWidth   = isMobile ? Math.min(window.innerWidth - 40, 280) : 360;
+  const MAX_PAGE_WIDTH = 512;
+  const pageWidth = isMobile
+    ? Math.min(window.innerWidth - 40, 280)
+    : Math.min(MAX_PAGE_WIDTH, Math.floor((window.innerWidth - 260) / 2));
   const pageHeight  = Math.round(pageWidth * 1.414);
-  const stageWidth  = isMobile ? window.innerWidth - 20 : 900;
+  const stageWidth  = isMobile ? window.innerWidth - 20 : window.innerWidth - 80;
 
   // Show up to 5 pages in the fan
   const slots = [-2, -1, 0, 1, 2];

@@ -46,8 +46,13 @@ export const CardsViewer = forwardRef<ViewerRef, BaseViewerProps>(({
 
   useImperativeHandle(ref, () => ({ goNext, goPrev, goToPage }));
 
-  const pageWidth  = isMobile ? Math.min(window.innerWidth - 40, 300) : 400;
+  const MAX_PAGE_WIDTH = 512;
+  const pageWidth = isMobile
+    ? Math.min(window.innerWidth - 40, 320)
+    : Math.min(MAX_PAGE_WIDTH, Math.floor((window.innerWidth - 260) / 2));
   const pageHeight = Math.round(pageWidth * 1.414);
+  const viewportWidth = pageWidth + 60;
+  const viewportHeight = pageHeight + 60;
 
   // Render up to 3 stacked card layers
   const visiblePages = [current + 2, current + 1, current].filter(i => i < pages.length && i >= 0);
@@ -56,8 +61,8 @@ export const CardsViewer = forwardRef<ViewerRef, BaseViewerProps>(({
     <div
       className={cn('relative flex items-center justify-center')}
       style={{
-        width: pageWidth,
-        height: pageHeight,
+        width: viewportWidth,
+        height: viewportHeight,
         transform: `scale(${zoom})`,
         transformOrigin: 'center center',
       }}

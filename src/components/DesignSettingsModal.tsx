@@ -6,14 +6,14 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Button } from './ui/button';
 import { Label } from './ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { 
-  Layout, 
-  Book, 
-  Image as ImageIcon, 
-  FileText, 
-  Play, 
-  Layers, 
-  GalleryHorizontal, 
+import {
+  Layout,
+  Book,
+  Image as ImageIcon,
+  FileText,
+  Play,
+  Layers,
+  GalleryHorizontal,
   File,
   Check,
   Palette
@@ -97,8 +97,8 @@ export function DesignSettingsModal({ open, onOpenChange, flipbook, onUpdate }: 
                   key={mode.id}
                   className={cn(
                     "relative flex flex-col p-4 rounded-xl border-2 transition-all cursor-pointer hover:border-primary/50 group",
-                    designMode === mode.id 
-                      ? "border-primary bg-primary/10 ring-1 ring-primary/20" 
+                    designMode === mode.id
+                      ? "border-primary bg-primary/10 ring-1 ring-primary/20"
                       : "border-white/5 bg-white/5"
                   )}
                   onClick={() => setDesignMode(mode.id)}
@@ -127,13 +127,13 @@ export function DesignSettingsModal({ open, onOpenChange, flipbook, onUpdate }: 
 
           <TabsContent value="branding" className="space-y-6 pt-4">
             <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                 <div className="space-y-3">
                   <Label className="text-sm font-medium">Background Color</Label>
                   <div className="flex gap-4 items-center bg-white/5 p-3 rounded-xl border border-white/5">
-                    <input 
-                      type="color" 
-                      value={config.backgroundColor || '#18181b'} 
+                    <input
+                      type="color"
+                      value={config.backgroundColor || '#18181b'}
                       onChange={(e) => updateConfig('backgroundColor', e.target.value)}
                       className="h-10 w-12 rounded-lg bg-transparent border-none cursor-pointer overflow-hidden"
                     />
@@ -146,15 +146,30 @@ export function DesignSettingsModal({ open, onOpenChange, flipbook, onUpdate }: 
                 <div className="space-y-3">
                   <Label className="text-sm font-medium">Accent Color</Label>
                   <div className="flex gap-4 items-center bg-white/5 p-3 rounded-xl border border-white/5">
-                    <input 
-                      type="color" 
-                      value={config.accentColor || '#06b6d4'} 
+                    <input
+                      type="color"
+                      value={config.accentColor || '#06b6d4'}
                       onChange={(e) => updateConfig('accentColor', e.target.value)}
                       className="h-10 w-12 rounded-lg bg-transparent border-none cursor-pointer overflow-hidden"
                     />
                     <div className="flex flex-col">
                       <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground">HEX CODE</span>
                       <span className="text-sm font-semibold">{config.accentColor || '#06b6d4'}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium">Header Color</Label>
+                  <div className="flex gap-4 items-center bg-white/5 p-3 rounded-xl border border-white/5">
+                    <input
+                      type="color"
+                      value={config.headerColor || '#18181b'}
+                      onChange={(e) => updateConfig('headerColor', e.target.value)}
+                      className="h-10 w-12 rounded-lg bg-transparent border-none cursor-pointer overflow-hidden"
+                    />
+                    <div className="flex flex-col">
+                      <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground">HEX CODE</span>
+                      <span className="text-sm font-semibold">{config.headerColor || '#18181b'}</span>
                     </div>
                   </div>
                 </div>
@@ -183,9 +198,9 @@ export function DesignSettingsModal({ open, onOpenChange, flipbook, onUpdate }: 
                   <Label className="text-sm font-semibold">Allow Download</Label>
                   <p className="text-[11px] text-muted-foreground">Enable original PDF download button.</p>
                 </div>
-                <input 
-                  type="checkbox" 
-                  checked={config.showDownload !== false} 
+                <input
+                  type="checkbox"
+                  checked={config.showDownload !== false}
                   onChange={(e) => updateConfig('showDownload', e.target.checked)}
                   className="h-5 w-5 rounded-md border-white/20 bg-white/5 text-primary focus:ring-primary focus:ring-offset-0"
                 />
@@ -195,9 +210,9 @@ export function DesignSettingsModal({ open, onOpenChange, flipbook, onUpdate }: 
                   <Label className="text-sm font-semibold">Enable Printing</Label>
                   <p className="text-[11px] text-muted-foreground">Allow viewers to print specific pages.</p>
                 </div>
-                <input 
-                  type="checkbox" 
-                  checked={config.showPrint !== false} 
+                <input
+                  type="checkbox"
+                  checked={config.showPrint !== false}
                   onChange={(e) => updateConfig('showPrint', e.target.checked)}
                   className="h-5 w-5 rounded-md border-white/20 bg-white/5 text-primary focus:ring-primary focus:ring-offset-0"
                 />
@@ -207,9 +222,9 @@ export function DesignSettingsModal({ open, onOpenChange, flipbook, onUpdate }: 
                   <Label className="text-sm font-semibold">Page Turn Sounds</Label>
                   <p className="text-[11px] text-muted-foreground">Subtle realistic paper sound effects.</p>
                 </div>
-                <input 
-                  type="checkbox" 
-                  checked={config.enableSound !== false} 
+                <input
+                  type="checkbox"
+                  checked={config.enableSound !== false}
                   onChange={(e) => updateConfig('enableSound', e.target.checked)}
                   className="h-5 w-5 rounded-md border-white/20 bg-white/5 text-primary focus:ring-primary focus:ring-offset-0"
                 />
@@ -219,10 +234,22 @@ export function DesignSettingsModal({ open, onOpenChange, flipbook, onUpdate }: 
                   <Label className="text-sm font-semibold">Spine Shadows</Label>
                   <p className="text-[11px] text-muted-foreground">Render realistic 3D lighting effects.</p>
                 </div>
-                <input 
-                  type="checkbox" 
-                  checked={config.showShadows !== false} 
+                <input
+                  type="checkbox"
+                  checked={config.showShadows !== false}
                   onChange={(e) => updateConfig('showShadows', e.target.checked)}
+                  className="h-5 w-5 rounded-md border-white/20 bg-white/5 text-primary focus:ring-primary focus:ring-offset-0"
+                />
+              </div>
+              <div className="flex items-center justify-between p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 transition-colors">
+                <div className="space-y-0.5">
+                  <Label className="text-sm font-semibold">Show Top Header</Label>
+                  <p className="text-[11px] text-muted-foreground">Display the navigation bar at the top.</p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={config.showHeader !== false}
+                  onChange={(e) => updateConfig('showHeader', e.target.checked)}
                   className="h-5 w-5 rounded-md border-white/20 bg-white/5 text-primary focus:ring-primary focus:ring-offset-0"
                 />
               </div>
