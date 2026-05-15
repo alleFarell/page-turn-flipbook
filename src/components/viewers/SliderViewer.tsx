@@ -3,7 +3,7 @@
  * TODO: implement custom DOM engine (no page-flip library).
  * Design feel: presentation slides, smooth horizontal sweep.
  */
-import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import { forwardRef, useImperativeHandle, useRef, useState, useEffect } from 'react';
 import { cn } from '../../lib/utils';
 import type { BaseViewerProps, ViewerRef } from './types';
 
@@ -46,11 +46,35 @@ export const SliderViewer = forwardRef<ViewerRef, BaseViewerProps>(({
 
   useImperativeHandle(ref, () => ({ goNext, goPrev, goToPage }));
 
-  const MAX_PAGE_WIDTH = 512;
-  const pageWidth = isMobile
-    ? Math.min(window.innerWidth - 40, 320)
-    : Math.min(MAX_PAGE_WIDTH, Math.floor((window.innerWidth - 260) / 2));
-  const pageHeight = Math.round(pageWidth * 1.414);
+  const isPortrait = isMobile;
+  const BASE_PAGE_WIDTH = 512;
+  const BASE_PAGE_HEIGHT = 724;
+
+  const pageWidth = isPortrait ? 320 : BASE_PAGE_WIDTH;
+  const pageHeight = isPortrait ? 453 : BASE_PAGE_HEIGHT;
+
+  // Responsive scaling to fit window
+  const [responsiveScale, setResponsiveScale] = useState(1);
+
+  useEffect(() => {
+    const updateScale = () => {
+      const paddingX = isPortrait ? 32 : 120;
+      const paddingY = 160; 
+      const availW = window.innerWidth - paddingX;
+      const availH = window.innerHeight - paddingY;
+      
+      const scaleW = availW / pageWidth;
+      const scaleH = availH / pageHeight;
+      
+      setResponsiveScale(Math.min(scaleW, scaleH, 1.2)); 
+    };
+    
+    updateScale();
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
+  }, [pageWidth, pageHeight, isPortrait]);
+
+  const finalZoom = zoom * responsiveScale;
 
   return (
     <div
@@ -58,7 +82,7 @@ export const SliderViewer = forwardRef<ViewerRef, BaseViewerProps>(({
       style={{
         width: pageWidth,
         height: pageHeight,
-        transform: `scale(${zoom})`,
+        transform: `scale(${finalZoom})`,
         transformOrigin: 'center center',
       }}
     >

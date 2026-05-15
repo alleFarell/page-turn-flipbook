@@ -2,7 +2,7 @@
  * OnePageViewer — single-page portrait view, always portrait mode.
  * Design feel: e-reader, document viewer, clean single-column.
  */
-import { forwardRef, useImperativeHandle } from 'react';
+import { forwardRef, useImperativeHandle, useState, useEffect } from 'react';
 import { cn } from '../../lib/utils';
 import { usePageFlip } from './usePageFlip';
 import type { BaseViewerProps, ViewerRef } from './types';
@@ -22,14 +22,14 @@ export const OnePageViewer = forwardRef<ViewerRef, BaseViewerProps>(({
 }, ref) => {
   // Always portrait — one page at a time regardless of device
   const isPortrait = true; // Always 1 page wide
-  const MAX_PAGE_WIDTH = 512;
-  const pageWidth = isMobile
-    ? Math.min(window.innerWidth - 40, 320)
-    : Math.min(MAX_PAGE_WIDTH, Math.floor((window.innerWidth - 260) / 2));
-  const pageHeight = Math.round(pageWidth * 1.414);
+  const BASE_PAGE_WIDTH = 512;
+  const BASE_PAGE_HEIGHT = 724;
 
-  const viewportWidth = pageWidth + 40;
-  const viewportHeight = pageHeight + 40;
+  const pageWidth = isMobile ? 320 : BASE_PAGE_WIDTH;
+  const pageHeight = isMobile ? 453 : BASE_PAGE_HEIGHT;
+
+  const viewportWidth = pageWidth;
+  const viewportHeight = pageHeight;
 
   const { containerRef, flipBookRef, layoutPage, isLoaded } = usePageFlip({
     pages, isPortrait, pageWidth, pageHeight,
@@ -50,6 +50,29 @@ export const OnePageViewer = forwardRef<ViewerRef, BaseViewerProps>(({
   // OnePageViewer is always centred — no spread offset needed
   void layoutPage;
 
+  // Responsive scaling to fit window
+  const [responsiveScale, setResponsiveScale] = useState(1);
+
+  useEffect(() => {
+    const updateScale = () => {
+      const paddingX = isMobile ? 32 : 120;
+      const paddingY = 160; 
+      const availW = window.innerWidth - paddingX;
+      const availH = window.innerHeight - paddingY;
+      
+      const scaleW = availW / viewportWidth;
+      const scaleH = availH / viewportHeight;
+      
+      setResponsiveScale(Math.min(scaleW, scaleH, 1.2)); 
+    };
+    
+    updateScale();
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
+  }, [viewportWidth, viewportHeight, isMobile]);
+
+  const finalZoom = zoom * responsiveScale;
+
   return (
     <div
       className={cn(
@@ -59,7 +82,7 @@ export const OnePageViewer = forwardRef<ViewerRef, BaseViewerProps>(({
       style={{
         width: viewportWidth,
         height: viewportHeight,
-        transform: `scale(${zoom})`,
+        transform: `scale(${finalZoom})`,
         transformOrigin: 'center center',
         transition: 'transform 0.8s cubic-bezier(0.4,0,0.2,1), opacity 0.7s ease-out',
         perspective: '2500px',

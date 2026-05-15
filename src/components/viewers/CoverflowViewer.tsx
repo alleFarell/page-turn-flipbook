@@ -3,7 +3,7 @@
  * TODO: implement full 3D perspective rotation engine.
  * Design feel: Apple iTunes Coverflow, cinematic 3D fan.
  */
-import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import { forwardRef, useImperativeHandle, useRef, useState, useEffect } from 'react';
 import { cn } from '../../lib/utils';
 import type { BaseViewerProps, ViewerRef } from './types';
 
@@ -46,12 +46,40 @@ export const CoverflowViewer = forwardRef<ViewerRef, BaseViewerProps>(({
 
   useImperativeHandle(ref, () => ({ goNext, goPrev, goToPage }));
 
-  const MAX_PAGE_WIDTH = 512;
-  const pageWidth = isMobile
-    ? Math.min(window.innerWidth - 40, 280)
-    : Math.min(MAX_PAGE_WIDTH, Math.floor((window.innerWidth - 260) / 2));
-  const pageHeight  = Math.round(pageWidth * 1.414);
-  const stageWidth  = isMobile ? window.innerWidth - 20 : window.innerWidth - 80;
+  const isPortrait = isMobile;
+  const BASE_PAGE_WIDTH = 512;
+  const BASE_PAGE_HEIGHT = 724;
+  const BASE_STAGE_WIDTH = 1200;
+
+  const pageWidth = isPortrait ? 280 : BASE_PAGE_WIDTH;
+  const pageHeight = isPortrait ? 396 : BASE_PAGE_HEIGHT;
+  const stageWidth = isPortrait ? 400 : BASE_STAGE_WIDTH;
+  
+  const viewportWidth = stageWidth;
+  const viewportHeight = pageHeight + 60;
+
+  // Responsive scaling to fit window
+  const [responsiveScale, setResponsiveScale] = useState(1);
+
+  useEffect(() => {
+    const updateScale = () => {
+      const paddingX = isPortrait ? 20 : 80;
+      const paddingY = 160; 
+      const availW = window.innerWidth - paddingX;
+      const availH = window.innerHeight - paddingY;
+      
+      const scaleW = availW / viewportWidth;
+      const scaleH = availH / viewportHeight;
+      
+      setResponsiveScale(Math.min(scaleW, scaleH, 1.2)); 
+    };
+    
+    updateScale();
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
+  }, [viewportWidth, viewportHeight, isPortrait]);
+
+  const finalZoom = zoom * responsiveScale;
 
   // Show up to 5 pages in the fan
   const slots = [-2, -1, 0, 1, 2];
@@ -60,10 +88,10 @@ export const CoverflowViewer = forwardRef<ViewerRef, BaseViewerProps>(({
     <div
       className={cn('relative flex items-center justify-center overflow-hidden')}
       style={{
-        width: stageWidth,
-        height: pageHeight + 60,
+        width: viewportWidth,
+        height: viewportHeight,
         perspective: '1200px',
-        transform: `scale(${zoom})`,
+        transform: `scale(${finalZoom})`,
         transformOrigin: 'center center',
       }}
     >

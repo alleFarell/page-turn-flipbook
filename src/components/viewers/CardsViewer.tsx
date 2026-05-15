@@ -3,7 +3,7 @@
  * TODO: implement full gesture-based card engine.
  * Design feel: card stack, Tinder-style swipe, photo stack.
  */
-import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import { forwardRef, useImperativeHandle, useRef, useState, useEffect } from 'react';
 import { cn } from '../../lib/utils';
 import type { BaseViewerProps, ViewerRef } from './types';
 
@@ -46,13 +46,37 @@ export const CardsViewer = forwardRef<ViewerRef, BaseViewerProps>(({
 
   useImperativeHandle(ref, () => ({ goNext, goPrev, goToPage }));
 
-  const MAX_PAGE_WIDTH = 512;
-  const pageWidth = isMobile
-    ? Math.min(window.innerWidth - 40, 320)
-    : Math.min(MAX_PAGE_WIDTH, Math.floor((window.innerWidth - 260) / 2));
-  const pageHeight = Math.round(pageWidth * 1.414);
+  const isPortrait = isMobile;
+  const BASE_PAGE_WIDTH = 512;
+  const BASE_PAGE_HEIGHT = 724;
+
+  const pageWidth = isPortrait ? 320 : BASE_PAGE_WIDTH;
+  const pageHeight = isPortrait ? 453 : BASE_PAGE_HEIGHT;
   const viewportWidth = pageWidth + 60;
   const viewportHeight = pageHeight + 60;
+
+  // Responsive scaling to fit window
+  const [responsiveScale, setResponsiveScale] = useState(1);
+
+  useEffect(() => {
+    const updateScale = () => {
+      const paddingX = isPortrait ? 32 : 120;
+      const paddingY = 160; 
+      const availW = window.innerWidth - paddingX;
+      const availH = window.innerHeight - paddingY;
+      
+      const scaleW = availW / viewportWidth;
+      const scaleH = availH / viewportHeight;
+      
+      setResponsiveScale(Math.min(scaleW, scaleH, 1.2)); 
+    };
+    
+    updateScale();
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
+  }, [viewportWidth, viewportHeight, isPortrait]);
+
+  const finalZoom = zoom * responsiveScale;
 
   // Render up to 3 stacked card layers
   const visiblePages = [current + 2, current + 1, current].filter(i => i < pages.length && i >= 0);
@@ -63,7 +87,7 @@ export const CardsViewer = forwardRef<ViewerRef, BaseViewerProps>(({
       style={{
         width: viewportWidth,
         height: viewportHeight,
-        transform: `scale(${zoom})`,
+        transform: `scale(${finalZoom})`,
         transformOrigin: 'center center',
       }}
     >

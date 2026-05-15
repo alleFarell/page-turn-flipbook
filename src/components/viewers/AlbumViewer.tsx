@@ -2,7 +2,7 @@
  * AlbumViewer — wide landscape spread.
  * Design feel: photo album, presentation deck, wide-format portfolio.
  */
-import { forwardRef, useImperativeHandle } from 'react';
+import { forwardRef, useImperativeHandle, useState, useEffect } from 'react';
 import { cn } from '../../lib/utils';
 import { usePageFlip } from './usePageFlip';
 import type { BaseViewerProps, ViewerRef } from './types';
@@ -22,15 +22,15 @@ export const AlbumViewer = forwardRef<ViewerRef, BaseViewerProps>(({
 }, ref) => {
   // Album pages are landscape (shorter height)
   const isPortrait = isMobile;
-  const MAX_PAGE_WIDTH = 512;
-  const pageWidth = isMobile
-    ? Math.min(window.innerWidth - 40, 320)
-    : Math.min(MAX_PAGE_WIDTH, Math.floor((window.innerWidth - 260) / 2));
-  const pageHeight = Math.round(pageWidth * 0.7); // 4:3 landscape ratio
+  const BASE_PAGE_WIDTH = 512;
+  const BASE_PAGE_HEIGHT = 358; // 4:3 landscape ratio
+
+  const pageWidth = isPortrait ? 320 : BASE_PAGE_WIDTH;
+  const pageHeight = isPortrait ? 224 : BASE_PAGE_HEIGHT;
 
   const spreadWidth = pageWidth * (isPortrait ? 1 : 2);
-  const viewportWidth = isPortrait ? pageWidth + 40 : spreadWidth + 270;
-  const viewportHeight = pageHeight + 40;
+  const viewportWidth = spreadWidth;
+  const viewportHeight = pageHeight;
 
   const { containerRef, flipBookRef, layoutPage, isLoaded } = usePageFlip({
     pages, isPortrait, pageWidth, pageHeight,
@@ -48,6 +48,29 @@ export const AlbumViewer = forwardRef<ViewerRef, BaseViewerProps>(({
     },
   }));
 
+  // Responsive scaling to fit window
+  const [responsiveScale, setResponsiveScale] = useState(1);
+
+  useEffect(() => {
+    const updateScale = () => {
+      const paddingX = isPortrait ? 32 : 120;
+      const paddingY = 160; 
+      const availW = window.innerWidth - paddingX;
+      const availH = window.innerHeight - paddingY;
+      
+      const scaleW = availW / viewportWidth;
+      const scaleH = availH / viewportHeight;
+      
+      setResponsiveScale(Math.min(scaleW, scaleH, 1.2)); 
+    };
+    
+    updateScale();
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
+  }, [viewportWidth, viewportHeight, isPortrait]);
+
+  const finalZoom = zoom * responsiveScale;
+
   let xOffsetPx = 0;
   const isLastUnpaired = pages.length % 2 === 0 && layoutPage >= pages.length - 1;
   if (!isPortrait) {
@@ -64,7 +87,7 @@ export const AlbumViewer = forwardRef<ViewerRef, BaseViewerProps>(({
       style={{
         width: viewportWidth,
         height: viewportHeight,
-        transform: `translateX(${xOffsetPx}px) scale(${zoom})`,
+        transform: `scale(${finalZoom}) translateX(${xOffsetPx}px)`,
         transformOrigin: 'center center',
         transition: 'transform 0.8s cubic-bezier(0.4,0,0.2,1), opacity 0.7s ease-out',
         perspective: '2500px',

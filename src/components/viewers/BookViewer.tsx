@@ -8,7 +8,7 @@
  * All decoration is layered as siblings of containerRef — never inside it —
  * so PageFlip's DOM is never disturbed.
  */
-import { forwardRef, useImperativeHandle } from 'react';
+import { forwardRef, useImperativeHandle, useState, useEffect } from 'react';
 import { cn } from '../../lib/utils';
 import { usePageFlip } from './usePageFlip';
 import type { BaseViewerProps, ViewerRef } from './types';
@@ -28,15 +28,15 @@ export const BookViewer = forwardRef<ViewerRef, BaseViewerProps>(({
 }, ref) => {
   // Books are always landscape double-spread (portrait only on mobile)
   const isPortrait = isMobile;
-  const MAX_PAGE_WIDTH = 512;
-  const pageWidth = isMobile
-    ? Math.min(window.innerWidth - 40, 320)
-    : Math.min(MAX_PAGE_WIDTH, Math.floor((window.innerWidth - 260) / 2));
-  const pageHeight = Math.round(pageWidth * 1.414);
+  const BASE_PAGE_WIDTH = 512;
+  const BASE_PAGE_HEIGHT = 724;
+
+  const pageWidth = isPortrait ? 320 : BASE_PAGE_WIDTH;
+  const pageHeight = isPortrait ? 453 : BASE_PAGE_HEIGHT;
 
   const spreadWidth = pageWidth * (isPortrait ? 1 : 2);
-  const viewportWidth = isPortrait ? pageWidth + 40 : spreadWidth + 270;
-  const viewportHeight = pageHeight + 40;
+  const viewportWidth = spreadWidth;
+  const viewportHeight = pageHeight;
 
   const { containerRef, flipBookRef, layoutPage, isLoaded } = usePageFlip({
     pages, isPortrait, pageWidth, pageHeight,
@@ -60,6 +60,29 @@ export const BookViewer = forwardRef<ViewerRef, BaseViewerProps>(({
   const isBackCover     = !isPortrait && isLastUnpaired;
   const isSingleCover   = isFrontCover || isBackCover;
 
+  // Responsive scaling to fit window
+  const [responsiveScale, setResponsiveScale] = useState(1);
+
+  useEffect(() => {
+    const updateScale = () => {
+      const paddingX = isPortrait ? 32 : 120;
+      const paddingY = 160; 
+      const availW = window.innerWidth - paddingX;
+      const availH = window.innerHeight - paddingY;
+      
+      const scaleW = availW / viewportWidth;
+      const scaleH = availH / viewportHeight;
+      
+      setResponsiveScale(Math.min(scaleW, scaleH, 1.2)); 
+    };
+    
+    updateScale();
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
+  }, [viewportWidth, viewportHeight, isPortrait]);
+
+  const finalZoom = zoom * responsiveScale;
+
   // Spread-centering offset
   let xOffsetPx = 0;
   if (!isPortrait) {
@@ -81,7 +104,7 @@ export const BookViewer = forwardRef<ViewerRef, BaseViewerProps>(({
       style={{
         width: viewportWidth,
         height: viewportHeight,
-        transform: `translateX(${xOffsetPx}px) scale(${zoom})`,
+        transform: `scale(${finalZoom}) translateX(${xOffsetPx}px)`,
         transformOrigin: 'center center',
         transition: 'transform 0.8s cubic-bezier(0.4,0,0.2,1), opacity 0.7s ease-out',
         perspective: '2500px',
